@@ -1,0 +1,22 @@
+{
+  "name": "zayer-digital",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "client": "npm run dev --workspace zayer-digital-client",
+    "server": "npm run dev --workspace zayer-digital-server",
+    "dev": "concurrently -n client,server -c cyan,magenta \"npm run dev --workspace zayer-digital-client\" \"npm run dev --workspace zayer-digital-server\"",
+    "build": "npm run build --workspace zayer-digital-client"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  },
+  "overrides": {
+    "shell-quote": "^1.12.0"
+  }
+}
