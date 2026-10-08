@@ -1,3 +1,5 @@
+import { env } from '../config/env.js'
+
 export function notFound(req, res, next) {
   res.status(404)
   next(new Error(`Route not found: ${req.method} ${req.originalUrl}`))
@@ -9,7 +11,8 @@ export function errorHandler(error, req, res, _next) {
     || (['ValidationError', 'CastError', 'StrictModeError'].includes(error.name) ? 400 : 0)
     || (error.code === 11000 ? 409 : 0)
     || (res.statusCode >= 400 ? res.statusCode : 500)
-  const message = statusCode === 500 && process.env.NODE_ENV === 'production'
+  const exposeDebugDetails = env.exposeErrorDetails
+  const message = statusCode === 500 && !exposeDebugDetails
     ? 'An unexpected server error occurred.'
     : error.message
 
@@ -40,7 +43,7 @@ export function errorHandler(error, req, res, _next) {
     success: false,
     error: {
       message,
-      ...(process.env.NODE_ENV !== 'production' && { stack: error.stack }),
+      ...(exposeDebugDetails && { stack: error.stack }),
     },
   })
 }

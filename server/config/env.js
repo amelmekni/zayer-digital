@@ -16,6 +16,10 @@ if (!/^\d+(?:s|m|h|d)$/.test(jwtExpiresIn)) {
   throw new Error('JWT_EXPIRES_IN must use a duration such as 15m, 1h, or 7d.')
 }
 
+const nodeEnv = process.env.NODE_ENV?.trim().toLowerCase() || 'development'
+const exposeErrorDetails = Boolean(process.env.NODE_ENV?.trim())
+  && ['development', 'test'].includes(nodeEnv)
+
 export const env = Object.freeze({
   port: Number.parseInt(process.env.PORT || '5000', 10),
   mongoUri: process.env.MONGO_URI.trim(),
@@ -26,7 +30,8 @@ export const env = Object.freeze({
     .split(',')
     .map((url) => url.trim())
     .filter(Boolean),
-  nodeEnv: process.env.NODE_ENV || 'development',
+  nodeEnv,
+  exposeErrorDetails,
 })
 
 if (!Number.isInteger(env.port) || env.port < 1 || env.port > 65535) {
