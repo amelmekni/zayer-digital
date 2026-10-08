@@ -71,6 +71,44 @@ export default {
   },
   serviceNames: { seo: 'SEO & Content Marketing', social: 'Social Media Management', paid: 'Paid Advertising (Google & Meta)', branding: 'Branding & Creative', web: 'Web Development', mobile: 'Mobile Development', shopify: 'Shopify & WordPress Websites', ai: 'AI & Automation', strategy: 'Digital Strategy' },
   categories: { all: 'All', creative: 'Creative', web: 'Web', mobile: 'Mobile', ecommerce: 'E-commerce', ai: 'AI', marketing: 'Marketing' },
+  privacyPolicy: {
+    eyebrow: 'Privacy Policy',
+    title: 'Privacy Policy',
+    intro: 'Information about data submitted through the ZAYER Digital website. Items marked [TO CONFIRM] need review before publication.',
+    sectionsEyebrow: 'Your information',
+    sectionsTitle: 'How information is handled',
+    sections: [
+      {
+        title: 'Who we are',
+        text: 'This website is presented under the name ZAYER Digital. The legal entity responsible for the website and the information described here is [TO CONFIRM].',
+      },
+      {
+        title: 'Data we collect',
+        text: 'The contact form asks for your name and email, and may include your phone number, company name and message. A job application asks for your name and email, and may include your phone number, message, the job you are applying for and a link to your CV. The application form accepts a CV link, not an uploaded file.',
+      },
+      {
+        title: 'Purpose',
+        text: 'Contact-form information is used to review and respond to your inquiry. Application information is used to review your application and communicate with you about it.',
+      },
+      {
+        title: 'Retention',
+        text: 'The retention period and deletion process for contact messages and job applications are [TO CONFIRM].',
+      },
+      {
+        title: 'Who can access it',
+        text: 'The people and service providers authorized to access contact messages and application information are [TO CONFIRM].',
+      },
+      {
+        title: 'Your requests',
+        text: 'For questions or requests about information you have submitted, contact us by email. Applicable rights and the process for handling and verifying requests are [TO CONFIRM].',
+      },
+    ],
+    contactTitle: 'Contact',
+    contactText: 'For questions about this notice or information submitted through the website, email:',
+    contactEmail: 'Contact@zayerdigital.tn',
+    confirmationNote: 'Confirm every [TO CONFIRM] item with the business owner before publishing this notice.',
+    contactLink: 'Contact ZAYER Digital',
+  },
   legacy: {
     home: {
       eyebrow: 'Digital Marketing Agency',
@@ -173,7 +211,9 @@ export default {
       formTitle: 'Send Us a Message', formCopy: 'We respond within 1 business day — usually much sooner.',
       firstName: 'First Name', lastName: 'Last Name', email: 'Email Address', phoneLabel: 'Phone Number',
       company: 'Company / Brand Name', message: 'Message', send: 'Send Message →',
-      disclaimer: "By submitting, you agree to our Privacy Policy. We'll never share your information.",
+      disclaimerBefore: 'For details on how information you submit is handled, read our ',
+      disclaimerLink: 'Privacy Policy',
+      disclaimerAfter: '.',
       success: 'Message received. Thank you—we’ll be in touch soon.',
     },
     portfolio: {
@@ -202,7 +242,7 @@ export default {
     },
     footer: {
       company: 'Company', about: 'About Us', services: 'Services', portfolio: 'Portfolio',
-      careers: 'Careers', contact: 'Contact', contactTitle: 'Contact',
+      careers: 'Careers', contact: 'Contact', privacy: 'Privacy Policy', contactTitle: 'Contact',
       email: 'Contact@zayerdigital.tn',
       phones: [['+216 48 134 666', '+21648134666'], ['+216 48 138 020', '+21648138020'], ['+216 48 131 021', '+21648131021'], ['+216 48 131 026', '+21648131026'], ['+216 48 103 042', '+21648103042']],
       website: 'www.zayerdigital.tn', websiteHref: 'https://www.zayerdigital.tn', location: 'MONTPLAISIR TUNIS',

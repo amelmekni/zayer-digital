@@ -9,6 +9,7 @@ import ServiceDetails from './pages/public/ServiceDetails.jsx'
 import Portfolio from './pages/public/Portfolio.jsx'
 import Careers from './pages/public/Careers.jsx'
 import Contact from './pages/public/Contact.jsx'
+import PrivacyPolicy from './pages/public/PrivacyPolicy.jsx'
 import AuthPage from './pages/public/AuthPage.jsx'
 import NotFound from './pages/public/NotFound.jsx'
 
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="/portfolio" element={<Portfolio />} />
         <Route path="/careers" element={<Careers />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/register" element={<AuthPage mode="register" />} />
       </Route>

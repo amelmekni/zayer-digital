@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { ArrowUpRight, Clock3, Globe2, Mail, MapPin, Phone } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import LegacyPageHero from '../../components/sections/LegacyPageHero.jsx'
 import Toast from '../../components/common/Toast.jsx'
 import Reveal from '../../components/common/Reveal.jsx'
@@ -110,7 +111,9 @@ export default function Contact() {
               <button className="legacy-button legacy-button-gold" type="submit" disabled={submitting}>
                 {submitting ? t.contact.submitting : content.send}<ArrowUpRight size={17} />
               </button>
-              <p className="legacy-form-disclaimer">{content.disclaimer}</p>
+              <p className="legacy-form-disclaimer">
+                {content.disclaimerBefore}<Link to="/privacy">{content.disclaimerLink}</Link>{content.disclaimerAfter}
+              </p>
             </form>
           </div>
         </Reveal>

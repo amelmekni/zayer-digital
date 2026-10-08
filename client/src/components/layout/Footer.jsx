@@ -23,6 +23,7 @@ export default function Footer() {
         <Link to="/portfolio">{footer.portfolio}</Link>
         <Link to="/careers">{footer.careers}</Link>
         <Link to="/contact">{footer.contact}</Link>
+        <Link to="/privacy">{footer.privacy}</Link>
       </div>
       <div className="legacy-footer-column">
         <h3>{footer.services}</h3>

@@ -79,6 +79,44 @@ export default {
   },
   serviceNames: { seo: 'SEO & marketing de contenu', social: 'Gestion des réseaux sociaux', paid: 'Publicité payante (Google & Meta)', branding: 'Identité & création', web: 'Développement web', mobile: 'Développement mobile', shopify: 'Sites Shopify & WordPress', ai: 'IA & automatisation', strategy: 'Stratégie digitale' },
   categories: { all: 'Tout', creative: 'Création', web: 'Web', mobile: 'Mobile', ecommerce: 'E-commerce', ai: 'IA', marketing: 'Marketing' },
+  privacyPolicy: {
+    eyebrow: 'Politique de confidentialité',
+    title: 'Politique de confidentialité',
+    intro: 'Informations sur les données transmises via le site de ZAYER Digital. Les éléments indiqués [TO CONFIRM] doivent être vérifiés avant publication.',
+    sectionsEyebrow: 'Vos informations',
+    sectionsTitle: 'Utilisation des informations',
+    sections: [
+      {
+        title: 'Qui sommes-nous ?',
+        text: 'Ce site est présenté sous le nom ZAYER Digital. La dénomination de l’entité juridique responsable du site et des informations décrites ici est [TO CONFIRM].',
+      },
+      {
+        title: 'Données collectées',
+        text: 'Le formulaire de contact demande votre nom et votre adresse e-mail ; il peut également recueillir votre téléphone, le nom de votre entreprise et votre message. Une candidature demande votre nom et votre adresse e-mail ; elle peut également inclure votre téléphone, un message, le poste visé et un lien vers votre CV. Le formulaire accepte un lien vers le CV, et non un fichier téléversé.',
+      },
+      {
+        title: 'Finalité',
+        text: 'Les informations du formulaire de contact servent à examiner votre demande et à y répondre. Les informations d’une candidature servent à examiner celle-ci et à communiquer avec vous à son sujet.',
+      },
+      {
+        title: 'Conservation',
+        text: 'La durée de conservation et la procédure de suppression des messages de contact et des candidatures sont [TO CONFIRM].',
+      },
+      {
+        title: 'Qui peut y accéder ?',
+        text: 'Les personnes et prestataires autorisés à accéder aux messages de contact et aux informations de candidature sont [TO CONFIRM].',
+      },
+      {
+        title: 'Vos demandes',
+        text: 'Pour toute question ou demande concernant les informations que vous avez transmises, contactez-nous par e-mail. Les droits applicables ainsi que la procédure de traitement et de vérification des demandes sont [TO CONFIRM].',
+      },
+    ],
+    contactTitle: 'Contact',
+    contactText: 'Pour toute question sur cette notice ou les informations transmises via le site, écrivez à :',
+    contactEmail: 'Contact@zayerdigital.tn',
+    confirmationNote: 'Vérifiez chaque élément [TO CONFIRM] avec le propriétaire de l’entreprise avant de publier cette notice.',
+    contactLink: 'Contacter ZAYER Digital',
+  },
   legacy: {
     home: {
       eyebrow: 'Agence Marketing Digital',
@@ -181,7 +219,9 @@ export default {
       formTitle: 'Envoyez-nous un Message', formCopy: 'Nous répondons sous 1 jour ouvrable — souvent beaucoup plus tôt.',
       firstName: 'Prénom', lastName: 'Nom', email: 'Adresse Email', phoneLabel: 'Téléphone',
       company: 'Nom de l’entreprise', message: 'Message', send: 'Envoyer le Message →',
-      disclaimer: 'En soumettant, vous acceptez notre Politique de Confidentialité. Nous ne partagerons jamais vos informations.',
+      disclaimerBefore: 'Pour savoir comment sont traitées les informations transmises, consultez notre ',
+      disclaimerLink: 'politique de confidentialité',
+      disclaimerAfter: '.',
       success: 'Message envoyé. Merci, nous vous répondrons bientôt.',
     },
     portfolio: {
@@ -210,7 +250,7 @@ export default {
     },
     footer: {
       company: 'Entreprise', about: 'À propos', services: 'Services', portfolio: 'Portfolio',
-      careers: 'Carrières', contact: 'Contact', contactTitle: 'Contact',
+      careers: 'Carrières', contact: 'Contact', privacy: 'Politique de confidentialité', contactTitle: 'Contact',
       email: 'Contact@zayerdigital.tn',
       phones: [['+216 48 134 666', '+21648134666'], ['+216 48 138 020', '+21648138020'], ['+216 48 131 021', '+21648131021'], ['+216 48 131 026', '+21648131026'], ['+216 48 103 042', '+21648103042']],
       website: 'www.zayerdigital.tn', websiteHref: 'https://www.zayerdigital.tn', location: 'MONTPLAISIR TUNIS',
