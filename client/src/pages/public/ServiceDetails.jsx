@@ -20,13 +20,13 @@ export default function ServiceDetails() {
   const { data: service, loading, error, reload } = useApiResource(loadService, [loadService])
   if (loading) return <section className="section"><div className="container"><LoadingState label={t.common.loading} /></div></section>
   if (error) return <section className="section"><div className="container"><ErrorState message={error} onRetry={reload} /></div></section>
-  if (!service) return <section className="section"><div className="container"><ErrorState message="This service could not be found." /></div></section>
+  if (!service) return <section className="section"><div className="container"><ErrorState message={t.services.notFound} /></div></section>
   const Icon = serviceIcons[service.icon] || serviceIcons.Sparkles
   const title = getServiceTitle(service, language, t)
   const description = getServiceDescription(service, language, t)
   const features = service.features || service.benefits?.[language] || []
   return <>
-    <PageMeta title={`${title} Services`} description={description} />
+    <PageMeta title={`${title} ${t.services.detailsPageTitleSuffix}`} description={description} />
     <Hero compact label={t.services.label} title={<>{title}</>} description={description} primary={{ to: '/contact', label: t.common.getInTouch }} />
     <section className="section detail-section"><div className="container detail-layout">
       <div className="detail-main"><Reveal><div className="detail-icon"><Icon size={27} /></div><SectionTitle eyebrow={t.services.benefits} title={title} description={description} /></Reveal>
@@ -36,7 +36,7 @@ export default function ServiceDetails() {
         {service.technologies && <><h3 className="tech-title">{t.services.technologies}</h3><div className="tag-list">{service.technologies.map((item) => <span key={item}>{item}</span>)}</div></>}
       </Reveal>
     </div></section>
-    <section className="section section-soft"><div className="container detail-bottom"><div><span className="eyebrow">A CONNECTED APPROACH</span><h2>Built to work with the rest of your digital journey.</h2></div><Link className="button button-dark" to="/contact">{t.common.getInTouch}<ArrowUpRight size={17} /></Link></div></section>
+    <section className="section section-soft"><div className="container detail-bottom"><div><span className="eyebrow">{t.services.connectedApproachEyebrow}</span><h2>{t.services.connectedApproachTitle}</h2></div><Link className="button button-dark" to="/contact">{t.common.getInTouch}<ArrowUpRight size={17} /></Link></div></section>
     <CTASection title={t.services.ctaTitle} description={t.services.ctaCopy} />
   </>
 }

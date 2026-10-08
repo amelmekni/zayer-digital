@@ -48,6 +48,9 @@ export default {
     ctaAction: 'Get a Free Strategy Session',
     label: 'Our services', title: 'Six Disciplines. One Growth Engine.', intro: 'From SEO and paid media to social media and branding, ZAYER Digital delivers measurable growth for ambitious businesses ready to become leaders in their market.',
     benefits: 'What you get', deliverables: 'Typical deliverables', technologies: 'Technology', category: 'Category', explore: 'Explore service',
+    notFound: 'This service could not be found.', detailsPageTitleSuffix: 'Services',
+    connectedApproachEyebrow: 'A connected approach',
+    connectedApproachTitle: 'Built to work with the rest of your digital journey.',
   },
   portfolio: { label: 'Selected work', title: 'We build digital experiences that make an impact', intro: 'Explore selected projects from our digital work.', allEyebrow: 'Selected work', allTitle: 'Ideas with purpose', problem: 'The challenge', solution: 'Our approach', outcome: 'Expected outcome', publishedCount: 'Published projects', featuredCount: 'Featured projects', categoryCount: 'Project categories', clientLabel: 'Client', yearLabel: 'Year', empty: 'There are no published projects to display right now.', emptyCategory: 'There are no projects in this category yet.' },
   careers: {
@@ -218,8 +221,8 @@ export default {
     },
     portfolio: {
       breadcrumb: 'Portfolio',
-      title: 'We Build Brands That Dominate Digitally',
-      intro: 'A results-driven agency: strategy, creativity, and performance in service of your growth.',
+      title: 'Selected Work. Meaningful Impact.',
+      intro: 'Explore digital projects shaped by thoughtful strategy, creative craft and measurable results.',
       servicesEyebrow: 'What We Do', servicesTitle: 'Our Services',
       sections: [
         { id: 'creative', eyebrow: 'Portfolio', title: 'Creative Production', empty: 'No creative projects yet.' },

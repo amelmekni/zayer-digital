@@ -56,6 +56,9 @@ export default {
     ctaAction: 'Demander une session stratégique gratuite',
     label: 'Nos services', title: 'Six expertises. Un moteur de croissance.', intro: 'Du SEO et des médias payants aux réseaux sociaux et au branding, ZAYER Digital génère une croissance mesurable pour les entreprises ambitieuses prêtes à devenir des leaders de leur marché.',
     benefits: 'Vos avantages', deliverables: 'Livrables courants', technologies: 'Technologies', category: 'Catégorie', explore: 'Découvrir le service',
+    notFound: 'Ce service est introuvable.', detailsPageTitleSuffix: 'Services',
+    connectedApproachEyebrow: 'Une approche intégrée',
+    connectedApproachTitle: 'Des solutions pensées pour s’intégrer à tout votre écosystème digital.',
   },
   portfolio: { label: 'Projets sélectionnés', title: 'Nous créons des expériences digitales qui marquent', intro: 'Découvrez une sélection de nos projets digitaux.', allEyebrow: 'Projets sélectionnés', allTitle: 'Des idées qui ont du sens', problem: 'Le défi', solution: 'Notre approche', outcome: 'Résultat attendu', publishedCount: 'Projets publiés', featuredCount: 'Projets à la une', categoryCount: 'Catégories', clientLabel: 'Client', yearLabel: 'Année', empty: 'Aucun projet publié pour le moment.', emptyCategory: 'Aucun projet dans cette catégorie pour le moment.' },
   careers: {
@@ -226,8 +229,8 @@ export default {
     },
     portfolio: {
       breadcrumb: 'Portfolio',
-      title: 'We Build Brands That Dominate Digitally',
-      intro: 'Une agence orientée résultats : stratégie, créativité et performance au service de votre croissance.',
+      title: 'Des projets qui font la différence.',
+      intro: 'Découvrez des réalisations digitales portées par une stratégie réfléchie, une créativité soignée et des résultats mesurables.',
       servicesEyebrow: 'Ce Que Nous Faisons', servicesTitle: 'Nos Services',
       sections: [
         { id: 'creative', eyebrow: 'Portfolio', title: 'Production Créative', empty: 'Aucun contenu créatif pour le moment.' },
