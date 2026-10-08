@@ -1,5 +1,12 @@
 export default {
   nav: { home: 'Accueil', about: 'À propos', services: 'Services', portfolio: 'Portfolio', careers: 'Carrières', contact: 'Contact', menu: 'Ouvrir le menu', close: 'Fermer le menu' },
+  pageTitles: {
+    home: 'ZAYER Digital — Agence de marketing digital',
+    about: 'À propos de ZAYER Digital',
+    portfolio: 'Portfolio ZAYER Digital',
+    careers: 'Carrières chez ZAYER Digital',
+    contact: 'Contactez ZAYER Digital',
+  },
   common: { explore: 'Découvrir nos services', start: 'Accélérez votre croissance', learn: 'En savoir plus', viewAll: 'Voir tous les projets', getInTouch: 'Contactez-nous', viewProject: 'Voir le projet', send: 'Envoyer le message', apply: 'Postuler', loading: 'Chargement', demo: 'Projet démo', all: 'Tout', backHome: "Retour à l'accueil", notFound: 'Page introuvable', notFoundText: 'La page recherchée a peut-être été déplacée ou n’existe plus.', ctaEyebrow: 'Session stratégique gratuite', newYork: 'New York · Au service du monde entier', ctaAction: 'Contactez-nous', teamIntro: 'Une équipe pluridisciplinaire, animée par la curiosité et l’exigence.', applyIntro: 'Parlez-nous de vous et de ce que vous souhaitez apporter à l’équipe.', cvHint: 'Ajoutez un lien public vers votre CV. Le dépôt de fichiers n’est pas encore disponible.', projectStatLabel: 'Ambition de retour moyen' },
   home: {
     label: 'Agence digitale', titleA: 'Nous créons des expériences digitales', titleB: 'qui accélèrent votre croissance.',
@@ -196,7 +203,7 @@ export default {
       applicationTitle: 'Candidature spontanée',
       application: {
         firstName: 'Prénom', lastName: 'Nom', email: 'E-mail', phone: 'Téléphone',
-        message: 'Pourquoi rejoindre ZAYER ?', cv: 'Déposer un CV', cvLink: 'Lien vers le CV',
+        message: 'Pourquoi rejoindre ZAYER ?', cv: 'Lien vers le CV (URL)', cvLink: 'Lien vers le CV (URL)',
         cvHint: 'Collez un lien partageable vers votre CV. Le dépôt de fichiers n’est pas disponible avec l’API actuelle.',
         submit: 'Envoyer ma candidature →', submitting: 'Envoi…',
         success: 'Merci pour votre intérêt. Votre candidature a bien été envoyée.',

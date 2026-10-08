@@ -1,5 +1,12 @@
 export default {
   nav: { home: 'Home', about: 'About', services: 'Services', portfolio: 'Portfolio', careers: 'Careers', contact: 'Get In Touch', menu: 'Open menu', close: 'Close menu' },
+  pageTitles: {
+    home: 'ZAYER Digital — Digital Marketing Agency',
+    about: 'About ZAYER Digital',
+    portfolio: 'ZAYER Digital Portfolio',
+    careers: 'Careers at ZAYER Digital',
+    contact: 'Contact ZAYER Digital',
+  },
   common: { explore: 'Explore services', start: 'Start your growth', learn: 'Learn more', viewAll: 'View all projects', getInTouch: 'Get in touch', viewProject: 'View project', send: 'Send message', apply: 'Apply now', loading: 'Loading', demo: 'Demo Project', all: 'All', backHome: 'Back to home', notFound: 'Page not found', notFoundText: 'The page you are looking for may have moved or no longer exists.', ctaEyebrow: 'Free strategy session', newYork: 'New York · Working worldwide', ctaAction: 'Contact us', teamIntro: 'A multidisciplinary team, connected by curiosity and a shared commitment to great work.', applyIntro: 'Tell us a little about yourself and what you’d like to bring to the team.', cvHint: 'Share a public link to your CV. File uploads are not available yet.', projectStatLabel: 'Average ROI ambition' },
   home: {
     label: 'Digital agency', titleA: 'We build digital experiences', titleB: 'that drive growth.',
@@ -188,7 +195,7 @@ export default {
       applicationTitle: 'Submit an Open Application',
       application: {
         firstName: 'First Name', lastName: 'Last Name', email: 'Email', phone: 'Phone Number',
-        message: 'Why join ZAYER?', cv: 'Upload CV', cvLink: 'CV link',
+        message: 'Why join ZAYER?', cv: 'CV link (URL)', cvLink: 'CV link (URL)',
         cvHint: 'Paste a shareable link to your CV. File uploads are not supported by the current application API.',
         submit: 'Submit Application →', submitting: 'Submitting…',
         success: 'Thanks for your interest. Your application has been submitted.',

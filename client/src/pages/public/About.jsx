@@ -12,7 +12,7 @@ export default function About() {
   const content = t.legacy.about
 
   return <>
-    <PageMeta title="About ZAYER Digital" description={content.intro} />
+    <PageMeta title={t.pageTitles.about} description={content.intro} />
     <LegacyPageHero
       pageLabel={content.breadcrumb}
       title={<>{content.title[0]}<br /><em>{content.title[1]}</em></>}

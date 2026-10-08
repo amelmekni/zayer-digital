@@ -126,7 +126,7 @@ export default function Portfolio() {
   }
 
   return <>
-    <PageMeta title="ZAYER Digital Portfolio" description={content.intro} />
+    <PageMeta title={t.pageTitles.portfolio} description={content.intro} />
     <LegacyPageHero pageLabel={content.breadcrumb} title={content.title} description={content.intro} />
 
     <section className="legacy-section legacy-portfolio-services" id="portfolio-services">

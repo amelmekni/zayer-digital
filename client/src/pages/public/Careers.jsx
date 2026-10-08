@@ -107,7 +107,7 @@ export default function Careers() {
   }
 
   return <>
-    <PageMeta title="Careers at ZAYER Digital" description={content.intro} />
+    <PageMeta title={t.pageTitles.careers} description={content.intro} />
     <LegacyPageHero
       pageLabel={content.breadcrumb}
       title={<>{content.title[0]}<br />{content.title[1].replace('ZAYER Digital', '')}<em>{content.title[1].includes('ZAYER Digital') ? 'ZAYER Digital' : ''}</em></>}

@@ -48,7 +48,7 @@ export default function Contact() {
   }
 
   return <>
-    <PageMeta title="Contact ZAYER Digital" description={content.intro} />
+    <PageMeta title={t.pageTitles.contact} description={content.intro} />
     <LegacyPageHero
       pageLabel={content.breadcrumb}
       title={<>{content.title[0]}<br />{content.title[1].split(' ').slice(0, -1).join(' ')} <em>{content.title[1].split(' ').at(-1)}</em></>}

@@ -21,7 +21,7 @@ export default function Home() {
   const officialServices = getOfficialServices(services)
 
   return <>
-    <PageMeta title="ZAYER Digital — Digital Marketing Agency" description={content.intro} />
+    <PageMeta title={t.pageTitles.home} description={content.intro} />
     <Hero
       video="hero-1.mp4"
       revealOnScroll
