@@ -334,6 +334,12 @@ h1, h2, h3, .brand-mark { font-family: "Playfair Display", Georgia, serif; }
 .legacy-value-card:hover { border-color: var(--gold); }
 .legacy-value-card h3 { margin: 17px 0 10px; color: var(--navy); font-family: "DM Sans", sans-serif; font-size: 17px; font-weight: 700; }
 .legacy-value-card p { margin: 0; color: var(--navy-mid); font-size: 13px; line-height: 1.7; }
+.privacy-policy-grid { display: grid; width: min(800px, 100%); grid-template-columns: minmax(0, 1fr); gap: 16px; margin: 0 auto; }
+.privacy-policy-card { min-width: 0; padding: 24px clamp(20px, 4vw, 32px); border-bottom: 3px solid transparent; background: var(--white); transition: border-color .2s; }
+.privacy-policy-card:hover { border-color: var(--gold); }
+.privacy-policy-card h3 { margin: 0 0 10px; color: var(--navy); font-family: "DM Sans", sans-serif; font-size: 17px; font-weight: 700; }
+.privacy-policy-card p { margin: 0; color: var(--navy-mid); font-size: 13px; line-height: 1.7; }
+.privacy-policy-card a { color: inherit; font: inherit; }
 .legacy-team-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 25px; }
 .legacy-team-grid > .reveal { min-width: 0; }
 .legacy-team-card { height: 100%; background: var(--off-white); }

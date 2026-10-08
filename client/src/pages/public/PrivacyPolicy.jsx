@@ -6,6 +6,7 @@ import { useLanguage } from '../../context/LanguageContext.jsx'
 export default function PrivacyPolicy() {
   const { t } = useLanguage()
   const content = t.privacyPolicy
+  const contactEmail = content.contactEmail.toLowerCase()
 
   return <>
     <PageMeta title={content.title} description={content.intro} />
@@ -21,18 +22,17 @@ export default function PrivacyPolicy() {
           <span className="legacy-eyebrow">{content.sectionsEyebrow}</span>
           <h2>{content.sectionsTitle}</h2>
         </div>
-        <div className="legacy-values-grid">
-          {content.sections.map((section) => <article className="legacy-value-card" key={section.title}>
+        <div className="privacy-policy-grid">
+          {content.sections.map((section) => <article className="privacy-policy-card" key={section.title}>
             <h3>{section.title}</h3>
             <p>{section.text}</p>
           </article>)}
-          <article className="legacy-value-card">
+          <article className="privacy-policy-card">
             <h3>{content.contactTitle}</h3>
-            <p>{content.contactText}</p>
-            <a href={`mailto:${content.contactEmail}`}>{content.contactEmail}</a>
+            <p>{content.contactText} <a href={`mailto:${contactEmail}`}>{contactEmail}</a></p>
           </article>
         </div>
-        <p className="legacy-form-disclaimer">{content.confirmationNote}</p>
+        {import.meta.env.DEV && <p className="legacy-form-disclaimer">{content.confirmationNote}</p>}
         <Link className="legacy-inline-link" to="/contact">{content.contactLink}</Link>
       </div>
     </section>

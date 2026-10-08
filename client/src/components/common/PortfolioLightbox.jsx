@@ -1,6 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 import { getProjectMedia } from '../cards/PortfolioMediaCard.jsx'
+import useFocusTrap from '../../hooks/useFocusTrap.js'
 
 function youtubeEmbedUrl(id) {
   return `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0`
@@ -8,6 +9,9 @@ function youtubeEmbedUrl(id) {
 
 export default function PortfolioLightbox({ project, onClose }) {
   const media = project ? getProjectMedia(project) : null
+  const dialogRef = useRef(null)
+
+  useFocusTrap(dialogRef, Boolean(project && media))
 
   useEffect(() => {
     if (!project) return undefined
@@ -40,7 +44,7 @@ export default function PortfolioLightbox({ project, onClose }) {
   return <div className="legacy-lightbox" role="presentation" onMouseDown={(event) => {
     if (event.target === event.currentTarget) onClose()
   }}>
-    <div className="legacy-lightbox-inner" role="dialog" aria-modal="true" aria-label={project.title}>
+    <div ref={dialogRef} className="legacy-lightbox-inner" role="dialog" aria-modal="true" aria-label={project.title} tabIndex={-1}>
       <button className="legacy-lightbox-close" type="button" aria-label="Close preview" onClick={onClose}><X size={24} /></button>
       {mediaElement}
       <p>{project.title}</p>

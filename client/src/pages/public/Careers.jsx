@@ -8,6 +8,7 @@ import { useLanguage } from '../../context/LanguageContext.jsx'
 import { jobService } from '../../services/jobService.js'
 import { applicationService } from '../../services/applicationService.js'
 import { useApiResource } from '../../hooks/useApiResource.js'
+import useFocusTrap from '../../hooks/useFocusTrap.js'
 import { ErrorState, LoadingState } from '../../components/common/ApiStates.jsx'
 
 const perkIcons = [Laptop, BookOpen, Trophy, HeartHandshake]
@@ -51,6 +52,7 @@ export default function Careers() {
   const content = t.legacy.careers
   const [filter, setFilter] = useState('all')
   const [selectedJob, setSelectedJob] = useState(null)
+  const jobDialogRef = useRef(null)
   const [toast, setToast] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState('')
@@ -58,6 +60,8 @@ export default function Careers() {
   const loadJobs = useCallback(() => jobService.getJobs(), [])
   const { data: jobs, loading, error, reload } = useApiResource(loadJobs, [loadJobs])
   const filteredJobs = (jobs || []).filter((job) => departmentMatches(job, filter))
+
+  useFocusTrap(jobDialogRef, Boolean(selectedJob))
 
   useEffect(() => {
     if (!selectedJob) return undefined
@@ -187,7 +191,7 @@ export default function Careers() {
     {selectedJob && <div className="legacy-modal-backdrop" onMouseDown={(event) => {
       if (event.target === event.currentTarget) setSelectedJob(null)
     }}>
-      <section className="legacy-job-modal" role="dialog" aria-modal="true" aria-labelledby="job-modal-title">
+      <section ref={jobDialogRef} className="legacy-job-modal" role="dialog" aria-modal="true" aria-labelledby="job-modal-title" tabIndex={-1}>
         <button className="legacy-modal-close" type="button" aria-label={t.nav.close} onClick={() => setSelectedJob(null)}><X size={21} /></button>
         <span className="legacy-eyebrow">{selectedJob.department}</span>
         <h2 id="job-modal-title">{selectedJob.title}</h2>
