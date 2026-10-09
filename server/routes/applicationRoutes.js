@@ -7,12 +7,14 @@ import {
 } from '../controllers/applicationController.js'
 import { authenticate } from '../middleware/authMiddleware.js'
 import { requireAdmin } from '../middleware/adminMiddleware.js'
+import { createPublicFormLimiter } from '../middleware/publicFormRateLimit.js'
 import { validateObjectId } from '../middleware/validationMiddleware.js'
 
 const router = Router()
+const applicationSubmissionLimiter = createPublicFormLimiter()
 
 router.route('/')
-  .post(createApplication)
+  .post(applicationSubmissionLimiter, createApplication)
   .get(authenticate, requireAdmin, getApplications)
 
 router.route('/:id')
