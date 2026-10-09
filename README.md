@@ -30,6 +30,11 @@ MERN application foundation for the ZAYER Digital public website and future admi
 - `npm test --workspace zayer-digital-server` runs the backend tests, including authentication, authorization, and the official service catalog checks.
 - `GET http://localhost:5099/api/health` reports API and database readiness when using the example environment.
 
+## Render deployment configuration
+
+- On the backend Web Service, set `CLIENT_URL` to `https://zayer-digital.onrender.com` so the API allows requests from the production frontend.
+- On the frontend Static Site, set the build-time `VITE_API_URL` to the deployed backend origin followed by `/api`. The backend URL has not been confirmed; do not use the frontend URL for this setting. Rebuild and redeploy the Static Site after setting it.
+
 The client API layer reads the bearer token from the single `localStorage` key `zayer_auth_token`; safe user details remain in memory and are reloaded through `/api/auth/me` on refresh. The token is removed automatically after an authenticated request receives `401 Unauthorized`. No password or server-side secret is stored in the client.
 
 The client exposes `/login` and `/register` for the Phase 5 auth API. Registration follows the API contract and does not sign the user in automatically. Reusable `ProtectedRoute` and `AdminRoute` guards are available for protected screens; no admin/dashboard routes are part of Phase 6.
