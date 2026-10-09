@@ -87,7 +87,6 @@ export const getApplications = asyncHandler(async (req, res) => {
 
 export const getApplicationById = asyncHandler(async (req, res) => {
   const application = await Application.findById(req.params.id)
-    .select('-cv')
     .populate('job', 'title slug department')
     .lean()
 
