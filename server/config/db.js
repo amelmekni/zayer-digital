@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { env } from './env.js'
+import { initializeAdminAccountGuard } from '../utils/adminAccountGuard.js'
 
 export async function connectDB() {
   mongoose.connection.on('error', (error) => {
@@ -10,5 +11,6 @@ export async function connectDB() {
     serverSelectionTimeoutMS: 10000,
   })
 
+  await initializeAdminAccountGuard()
   console.info(`MongoDB connected: ${mongoose.connection.host}`)
 }
