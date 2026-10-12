@@ -7,6 +7,8 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "seed:admin": "node seed/seedAdmin.js",
+    "seed:demo": "node seed/seedDemoData.js",
+    "reset:demo": "node seed/resetDemoData.js",
     "sync:official-services": "node seed/syncOfficialServices.js",
     "test": "node --test"
   },

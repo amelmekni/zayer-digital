@@ -2,11 +2,12 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import { createUserAccountMutations } from '../utils/userAccountMutations.js'
 
-function createFixture(initialUsers) {
+function createFixture(initialUsers, quoteOwners = []) {
   const records = new Map(initialUsers.map((user) => [
     user.id,
     { tokenVersion: 0, ...user },
   ]))
+  const quoteOwnerIds = new Set(quoteOwners)
   let tail = Promise.resolve()
   let guardedOperations = 0
 
@@ -27,6 +28,11 @@ function createFixture(initialUsers) {
 
   const mutations = createUserAccountMutations({
     withGuard,
+    quotes: {
+      async hasOwnedQuotes(id) {
+        return quoteOwnerIds.has(id)
+      },
+    },
     users: {
       async findRoleById(id) {
         const user = records.get(id)
@@ -147,6 +153,19 @@ test('allows safe deletion and demotion when multiple administrators exist', asy
     targetId: 'admin-c',
   })).kind, 'deleted')
   assert.equal([...records.values()].filter((user) => user.role === 'admin').length, 1)
+})
+
+test('blocks deletion of a user who owns quotes and preserves the account', async () => {
+  const { mutations, records } = createFixture([
+    ...admins,
+    { id: 'agent-a', role: 'sales_agent' },
+  ], ['agent-a'])
+
+  assert.deepEqual(await mutations.delete({
+    actorId: 'admin-a',
+    targetId: 'agent-a',
+  }), { kind: 'has-quotes' })
+  assert.equal(records.get('agent-a').role, 'sales_agent')
 })
 
 test('serializes competing deletion and demotion attempts so a final administrator remains', async () => {

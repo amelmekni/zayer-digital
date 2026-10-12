@@ -1,4 +1,4 @@
-export function createUserAccountMutations({ users, withGuard }) {
+export function createUserAccountMutations({ users, quotes, withGuard }) {
   return {
     async update({ actorId, targetId, update }) {
       return withGuard(async (session) => {
@@ -34,6 +34,8 @@ export function createUserAccountMutations({ users, withGuard }) {
           const administratorCount = await users.countAdmins(session)
           if (administratorCount <= 1) return { kind: 'last-admin' }
         }
+
+        if (await quotes.hasOwnedQuotes(targetId, session)) return { kind: 'has-quotes' }
 
         const user = await users.deleteById(targetId, session)
         return user ? { kind: 'deleted', user } : { kind: 'not-found' }

@@ -1,4 +1,5 @@
 import User from '../models/User.js'
+import Quote from '../models/Quote.js'
 import bcrypt from 'bcryptjs'
 import { env } from '../config/env.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
@@ -37,6 +38,9 @@ const userAccountMutations = createUserAccountMutations({
     deleteById: (id, session) => User.findByIdAndDelete(id)
       .select('name email')
       .session(session),
+  },
+  quotes: {
+    hasOwnedQuotes: (userId, session) => Quote.exists({ createdBy: userId }).session(session),
   },
   withGuard: withAdminAccountGuard,
 })
@@ -158,6 +162,9 @@ export const deleteUser = asyncHandler(async (req, res) => {
   }
   if (result.kind === 'last-admin') {
     return blockedUserMutation(res, 'The last administrator cannot be deleted.')
+  }
+  if (result.kind === 'has-quotes') {
+    return blockedUserMutation(res, 'Users with quotes cannot be deleted. Deactivate the account instead.')
   }
   if (result.kind === 'not-found' || !result.user) {
     return res.status(404).json({ success: false, error: { message: 'User not found.' } })

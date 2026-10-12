@@ -1,0 +1,201 @@
+{
+  "info": {
+    "_postman_id": "0f5a73c7-3582-47eb-a3c5-2a2d7d8f2026",
+    "name": "ZAYER Digital API — Local QA",
+    "description": "Local-only API smoke and workflow suite. It refuses non-loopback base URLs. Start the API only with the dedicated local zayer_digital_test database; some successful create workflows persist records because the API has no delete endpoint for quotes, applications, contacts, or public requests. See docs/postman/README.md.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const base = pm.environment.get('baseUrl') || pm.collectionVariables.get('baseUrl');",
+          "if (!base) throw new Error('Set baseUrl to your local API ending in /api.');",
+          "const parsed = new URL(base);",
+          "if (!['localhost', '127.0.0.1', '[::1]', '::1'].includes(parsed.hostname.toLowerCase()) || parsed.pathname.replace(/\\/$/, '') !== '/api') {",
+          "  throw new Error('Safety stop: this collection may only call a loopback API URL ending in /api.');",
+          "}",
+          "if (pm.request.name.startsWith('Register isolated test user')) {",
+          "  const run = `postman-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;",
+          "  pm.environment.set('testRunId', run);",
+          "  pm.environment.set('testUserEmail', `${run}@example.test`);",
+          "  pm.environment.set('quotePaymentKey', `quote-${run}-payment`);",
+          "  pm.environment.set('retainerPaymentKey', `retainer-${run}-payment`);",
+          "}",
+          "if (!pm.environment.get('testRunId')) pm.environment.set('testRunId', `postman-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);",
+          "const run = pm.environment.get('testRunId');",
+          "if (!pm.environment.get('testUserEmail')) pm.environment.set('testUserEmail', `${run}@example.test`);",
+          "if (!pm.environment.get('quotePaymentKey')) pm.environment.set('quotePaymentKey', `quote-${run}-payment`);",
+          "if (!pm.environment.get('retainerPaymentKey')) pm.environment.set('retainerPaymentKey', `retainer-${run}-payment`);"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const expectedMatch = pm.request.name.match(/\\[(\\d{3})(?:\\s+PDF)?\\]$/);",
+          "pm.test('Request documents its expected HTTP status', () => pm.expect(expectedMatch, pm.request.name).to.not.equal(null));",
+          "if (expectedMatch) pm.test(`HTTP ${expectedMatch[1]}`, () => pm.response.to.have.status(Number(expectedMatch[1])));",
+          "const expectsPdf = /\\[\\d{3}\\s+PDF\\]$/.test(pm.request.name);",
+          "if (expectsPdf && pm.response.code < 400) pm.test('PDF response has the expected content type and download header', () => { pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf'); pm.expect(pm.response.headers.get('Content-Disposition')).to.include('attachment'); });",
+          "if (!expectsPdf) {",
+          "  let body;",
+          "  try { body = pm.response.json(); } catch { body = null; }",
+          "  pm.test('JSON response uses the API envelope', () => { pm.expect(body, 'response JSON').to.be.an('object'); pm.expect(body.success).to.be.a('boolean'); });",
+          "  if (body && body.success === true && body.data && typeof body.data === 'object') {",
+          "    if (pm.request.name.startsWith('Create test application')) pm.test('Public application response omits CV content', () => pm.expect(body.data).to.not.have.property('cv'));",
+          "    if (pm.request.name.startsWith('Create isolated test quote')) pm.test('Quote totals are calculated by the API from the demo catalog', () => { pm.expect(body.data.status).to.equal('draft'); pm.expect(body.data.total).to.equal(450); pm.expect(body.data.depositAmount).to.equal(90); pm.expect(body.data.currency).to.equal('TND'); });",
+          "    if (pm.request.name.startsWith('Send created quote')) pm.test('Quote status changed to sent', () => pm.expect(body.data.status).to.equal('sent'));",
+          "    if (pm.request.name.startsWith('Approve created quote')) pm.test('Approved quote status is returned', () => pm.expect(body.data.status).to.equal('approved'));",
+          "    if (pm.request.name.startsWith('Record isolated quote payment')) pm.environment.set('quotePaymentSnapshot', JSON.stringify(body.data));",
+          "    if (pm.request.name.startsWith('Replay identical quote payment')) pm.test('Exact replay does not apply a second payment', () => pm.expect(JSON.stringify(body.data)).to.equal(pm.environment.get('quotePaymentSnapshot')));",
+          "    if (pm.request.name.startsWith('Submit public quote request')) pm.test('Public quote request is not an official quote', () => { pm.expect(body.data.officialQuoteCreated).to.equal(false); pm.expect(body.data.total).to.equal(450); pm.expect(body.data.currency).to.equal('TND'); });",
+          "    if (pm.request.name.startsWith('Login as admin')) pm.environment.set('adminToken', body.data.token);",
+          "    if (pm.request.name.startsWith('Login as sales agent')) pm.environment.set('salesToken', body.data.token);",
+          "    if (pm.request.name.startsWith('Login as standard user')) pm.environment.set('userToken', body.data.token);",
+          "    if (pm.request.name.startsWith('Register isolated test user')) pm.environment.set('registeredUserId', body.data.user.id);",
+          "    if (pm.request.name.startsWith('Create demo service')) pm.environment.set('createdServiceId', body.data._id);",
+          "    if (pm.request.name.startsWith('Create demo project')) pm.environment.set('createdProjectId', body.data._id);",
+          "    if (pm.request.name.startsWith('Create demo job')) pm.environment.set('createdJobId', body.data._id);",
+          "    if (pm.request.name.startsWith('Create demo agent')) pm.environment.set('createdAgentId', body.data.id);",
+          "    if (pm.request.name.startsWith('Create isolated test quote')) pm.environment.set('createdQuoteId', body.data._id);",
+          "    if (pm.request.name.startsWith('Create test contact')) pm.environment.set('createdContactId', body.data._id);",
+          "    if (pm.request.name.startsWith('Create test application')) pm.environment.set('createdApplicationId', body.data._id);",
+          "  }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://127.0.0.1:5000/api" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        { "name": "API and database health [200]", "request": { "method": "GET", "url": "{{baseUrl}}/health", "auth": { "type": "noauth" } } }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        { "name": "Register isolated test user [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Postman Local Tester\",\"email\":\"{{testUserEmail}}\",\"password\":\"{{testUserPassword}}\"}" }, "url": "{{baseUrl}}/auth/register", "auth": { "type": "noauth" } } },
+        { "name": "Login as admin [200]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"{{adminEmail}}\",\"password\":\"{{adminPassword}}\"}" }, "url": "{{baseUrl}}/auth/login", "auth": { "type": "noauth" } } },
+        { "name": "Login as sales agent [200]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"{{salesEmail}}\",\"password\":\"{{salesPassword}}\"}" }, "url": "{{baseUrl}}/auth/login", "auth": { "type": "noauth" } } },
+        { "name": "Login as standard user [200]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"{{userEmail}}\",\"password\":\"{{userPassword}}\"}" }, "url": "{{baseUrl}}/auth/login", "auth": { "type": "noauth" } } },
+        { "name": "Reject invalid credentials [401]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"email\":\"absent@example.test\",\"password\":\"incorrect-demo-password\"}" }, "url": "{{baseUrl}}/auth/login", "auth": { "type": "noauth" } } },
+        { "name": "Read current admin identity [200]", "request": { "method": "GET", "url": "{{baseUrl}}/auth/me", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{adminToken}}", "type": "string" }] } } },
+        { "name": "Read current standard-user identity [200]", "request": { "method": "GET", "url": "{{baseUrl}}/auth/me", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] } } }
+      ]
+    },
+    {
+      "name": "Services",
+      "item": [
+        { "name": "List active services [200]", "request": { "method": "GET", "url": "{{baseUrl}}/services?limit=20", "auth": { "type": "noauth" } } },
+        { "name": "Filter active services by category [200]", "request": { "method": "GET", "url": "{{baseUrl}}/services?category=marketing&sort=title", "auth": { "type": "noauth" } } },
+        { "name": "Read service by slug [200]", "request": { "method": "GET", "url": "{{baseUrl}}/services/seo", "auth": { "type": "noauth" } } },
+        { "name": "Read admin service catalogue [200]", "request": { "method": "GET", "url": "{{baseUrl}}/services/manage" } },
+        { "name": "Deny standard user service catalogue access [403]", "request": { "method": "GET", "url": "{{baseUrl}}/services/manage", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] } } },
+        { "name": "Create demo service [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Postman Demo Service\",\"slug\":\"postman-{{testRunId}}\",\"shortDescription\":\"Local test service\",\"description\":\"Fictional local test record.\",\"category\":\"marketing\",\"unit\":\"project\",\"price\":100,\"currency\":\"TND\",\"isActive\":true}" }, "url": "{{baseUrl}}/services" } },
+        { "name": "Update demo service [200]", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Updated Postman Demo Service\"}" }, "url": "{{baseUrl}}/services/{{createdServiceId}}" } },
+        { "name": "Reject malformed service ID [400]", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Invalid ID test\"}" }, "url": "{{baseUrl}}/services/not-an-object-id" } },
+        { "name": "Delete isolated demo service [200]", "request": { "method": "DELETE", "url": "{{baseUrl}}/services/{{createdServiceId}}" } }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        { "name": "List published projects [200]", "request": { "method": "GET", "url": "{{baseUrl}}/projects?limit=20", "auth": { "type": "noauth" } } },
+        { "name": "Filter featured projects [200]", "request": { "method": "GET", "url": "{{baseUrl}}/projects?featured=true", "auth": { "type": "noauth" } } },
+        { "name": "Read demo project by slug [200]", "request": { "method": "GET", "url": "{{baseUrl}}/projects/demo-identity-system", "auth": { "type": "noauth" } } },
+        { "name": "Create demo project [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Postman Demo Project\",\"slug\":\"postman-{{testRunId}}\",\"description\":\"Fictional local project.\",\"category\":\"creative\",\"portfolioSection\":\"creative\",\"image\":\"https://example.invalid/postman-demo.jpg\",\"client\":\"Demo Client\",\"year\":2026,\"isPublished\":false}" }, "url": "{{baseUrl}}/projects" } },
+        { "name": "Update demo project [200]", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Updated Postman Demo Project\"}" }, "url": "{{baseUrl}}/projects/{{createdProjectId}}" } },
+        { "name": "Delete isolated demo project [200]", "request": { "method": "DELETE", "url": "{{baseUrl}}/projects/{{createdProjectId}}" } }
+      ]
+    },
+    {
+      "name": "Careers and applications",
+      "item": [
+        { "name": "List active jobs [200]", "request": { "method": "GET", "url": "{{baseUrl}}/jobs?limit=20", "auth": { "type": "noauth" } }},
+        { "name": "Read demo job by slug [200]", "request": { "method": "GET", "url": "{{baseUrl}}/jobs/demo-marketing-specialist", "auth": { "type": "noauth" } }},
+        { "name": "Reject invalid job type filter [400]", "request": { "method": "GET", "url": "{{baseUrl}}/jobs?type=not-a-real-type", "auth": { "type": "noauth" } }},
+        { "name": "Create demo job [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Postman Demo Role\",\"slug\":\"postman-{{testRunId}}\",\"department\":\"Marketing\",\"location\":\"Remote\",\"type\":\"contract\",\"description\":\"Fictional local QA role.\",\"isActive\":true}" }, "url": "{{baseUrl}}/jobs" }},
+        { "name": "Update demo job [200]", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"title\":\"Updated Postman Demo Role\"}" }, "url": "{{baseUrl}}/jobs/{{createdJobId}}" } },
+        { "name": "Delete isolated demo job [200]", "request": { "method": "DELETE", "url": "{{baseUrl}}/jobs/{{createdJobId}}" }},
+        { "name": "Create test application (persists) [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"job\":\"{{demoJobId}}\",\"firstName\":\"Postman\",\"lastName\":\"{{testRunId}}\",\"email\":\"{{testUserEmail}}\",\"phone\":\"+21600000000\",\"cv\":\"https://example.invalid/postman-cv\",\"message\":\"Fictional local application.\"}" }, "url": "{{baseUrl}}/applications", "auth": { "type": "noauth" } }},
+        { "name": "List applications without CV content [200]", "request": { "method": "GET", "url": "{{baseUrl}}/applications?limit=20" }},
+        { "name": "Read isolated test application (contains CV URL) [200]", "request": { "method": "GET", "url": "{{baseUrl}}/applications/{{createdApplicationId}}" }},
+        { "name": "Update test application status [200]", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"status\":\"reviewing\"}" }, "url": "{{baseUrl}}/applications/{{createdApplicationId}}" }},
+        { "name": "Reject invalid application job ID [400]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"job\":\"invalid\",\"firstName\":\"A\",\"lastName\":\"B\",\"email\":\"x@example.test\"}" }, "url": "{{baseUrl}}/applications", "auth": { "type": "noauth" } }}
+      ]
+    },
+    {
+      "name": "Contact and public quote request",
+      "item": [
+        { "name": "Create test contact (persists) [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Postman Local Tester\",\"email\":\"{{testUserEmail}}\",\"company\":\"Fictional QA\",\"subject\":\"Postman {{testRunId}}\",\"message\":\"Fictional message for local API testing.\"}" }, "url": "{{baseUrl}}/contact", "auth": { "type": "noauth" } }},
+        { "name": "List contact inbox [200]", "request": { "method": "GET", "url": "{{baseUrl}}/contact?limit=20" }},
+        { "name": "Read test contact [200]", "request": { "method": "GET", "url": "{{baseUrl}}/contact/{{createdContactId}}" }},
+        { "name": "Archive test contact [200]", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"status\":\"archived\"}" }, "url": "{{baseUrl}}/contact/{{createdContactId}}" }},
+        { "name": "Reject invalid contact payload [400]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"x\",\"email\":\"invalid\",\"message\":\"x\"}" }, "url": "{{baseUrl}}/contact", "auth": { "type": "noauth" } }},
+        { "name": "Submit public quote request (persists in inbox) [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Postman Local Tester\",\"email\":\"{{testUserEmail}}\",\"company\":\"Fictional QA\",\"description\":\"Fictional service request for local testing.\",\"timeline\":\"within-1-month\",\"language\":\"en\",\"services\":[{\"serviceId\":\"{{demoServiceId}}\",\"quantity\":1,\"unitPrice\":0.01}]}" }, "url": "{{baseUrl}}/contact/quote-request", "auth": { "type": "noauth" } }},
+        { "name": "Download public indicative estimate [200 PDF]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Postman Local Tester\",\"email\":\"{{testUserEmail}}\",\"description\":\"Fictional service request for local testing.\",\"language\":\"en\",\"services\":[{\"serviceId\":\"{{demoServiceId}}\",\"quantity\":1}]}" }, "url": "{{baseUrl}}/contact/quote-request/pdf", "auth": { "type": "noauth" } }}
+      ]
+    },
+    {
+      "name": "Sales dashboard and quotes",
+      "item": [
+        { "name": "Admin sales dashboard summary [200]", "request": { "method": "GET", "url": "{{baseUrl}}/dashboard/summary" }},
+        { "name": "Sales-agent dashboard summary [200]", "request": { "method": "GET", "url": "{{baseUrl}}/dashboard/summary", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{salesToken}}", "type": "string" }] } }},
+        { "name": "Deny user dashboard access [403]", "request": { "method": "GET", "url": "{{baseUrl}}/dashboard/summary", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] } }},
+        { "name": "List all quotes as admin [200]", "request": { "method": "GET", "url": "{{baseUrl}}/quotes?limit=20" }},
+        { "name": "List owned quotes as sales agent [200]", "request": { "method": "GET", "url": "{{baseUrl}}/quotes?limit=20", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{salesToken}}", "type": "string" }] } }},
+        { "name": "Deny user quote listing [403]", "request": { "method": "GET", "url": "{{baseUrl}}/quotes", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] } }},
+        { "name": "Create isolated test quote (persists) [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"client\":{\"name\":\"Postman Demo Client\",\"company\":\"Fictional QA\",\"email\":\"{{testUserEmail}}\"},\"proposal\":\"Postman local test {{testRunId}}\",\"currency\":\"TND\",\"lineItems\":[{\"kind\":\"service\",\"serviceId\":\"{{demoServiceId}}\",\"quantity\":1,\"unitPrice\":0.01}],\"taxRate\":0,\"depositRate\":20,\"paymentTerms\":\"Local test only\"}" }, "url": "{{baseUrl}}/quotes", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{salesToken}}", "type": "string" }] } }},
+        { "name": "Read created test quote [200]", "request": { "method": "GET", "url": "{{baseUrl}}/quotes/{{createdQuoteId}}" }},
+        { "name": "Update created draft quote [200]", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"client\":{\"name\":\"Postman Demo Client\",\"email\":\"{{testUserEmail}}\"},\"proposal\":\"Updated local test {{testRunId}}\",\"currency\":\"TND\",\"lineItems\":[{\"kind\":\"service\",\"serviceId\":\"{{demoServiceId}}\",\"quantity\":1}],\"taxRate\":0,\"depositRate\":20}" }, "url": "{{baseUrl}}/quotes/{{createdQuoteId}}" }},
+        { "name": "Reject quote without line items [400]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"client\":{\"name\":\"Invalid Demo Client\"},\"currency\":\"TND\",\"lineItems\":[]}" }, "url": "{{baseUrl}}/quotes" }},
+        { "name": "Send created quote [200]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"status\":\"sent\"}" }, "url": "{{baseUrl}}/quotes/{{createdQuoteId}}/status" }},
+        { "name": "Approve created quote [200]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"status\":\"approved\"}" }, "url": "{{baseUrl}}/quotes/{{createdQuoteId}}/status" }},
+        { "name": "Reject invalid quote status [400]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"status\":\"unknown\"}" }, "url": "{{baseUrl}}/quotes/{{createdQuoteId}}/status" }},
+        { "name": "Download owned quote PDF [200 PDF]", "request": { "method": "GET", "url": "{{baseUrl}}/quotes/{{createdQuoteId}}/pdf" }},
+        { "name": "Hide admin quote from sales agent [404]", "request": { "method": "GET", "url": "{{baseUrl}}/quotes/{{adminApprovedQuoteId}}", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{salesToken}}", "type": "string" }] } }}
+      ]
+    },
+    {
+      "name": "Quote and retainer payments (idempotency)",
+      "item": [
+        { "name": "Record isolated quote payment [200]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Idempotency-Key", "value": "{{quotePaymentKey}}" }], "body": { "mode": "raw", "raw": "{\"amount\":1,\"note\":\"Fictional Postman local payment test\"}" }, "url": "{{baseUrl}}/quotes/{{adminApprovedQuoteId}}/payments" }},
+        { "name": "Replay identical quote payment [200]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Idempotency-Key", "value": "{{quotePaymentKey}}" }], "body": { "mode": "raw", "raw": "{\"amount\":1,\"note\":\"Fictional Postman local payment test\"}" }, "url": "{{baseUrl}}/quotes/{{adminApprovedQuoteId}}/payments" }},
+        { "name": "Reject changed request under same payment key [409]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Idempotency-Key", "value": "{{quotePaymentKey}}" }], "body": { "mode": "raw", "raw": "{\"amount\":2,\"note\":\"Changed request must conflict\"}" }, "url": "{{baseUrl}}/quotes/{{adminApprovedQuoteId}}/payments" }},
+        { "name": "Reject payment without idempotency key [400]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"amount\":1}" }, "url": "{{baseUrl}}/quotes/{{adminApprovedQuoteId}}/payments" }},
+        { "name": "Reject payment exceeding quote balance [409]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Idempotency-Key", "value": "over-balance-{{testRunId}}" }], "body": { "mode": "raw", "raw": "{\"amount\":100000,\"note\":\"Expected to exceed remaining balance\"}" }, "url": "{{baseUrl}}/quotes/{{adminApprovedQuoteId}}/payments" }},
+        { "name": "List retainer collections [200]", "request": { "method": "GET", "url": "{{baseUrl}}/retainer-collections?limit=20" }},
+        { "name": "Filter upcoming installments [200]", "request": { "method": "GET", "url": "{{baseUrl}}/retainer-collections?state=upcoming" }},
+        { "name": "Record isolated retainer payment [200]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Idempotency-Key", "value": "{{retainerPaymentKey}}" }], "body": { "mode": "raw", "raw": "{\"amount\":1,\"note\":\"Fictional Postman local installment test\"}" }, "url": "{{baseUrl}}/retainer-collections/{{demoCollectionId}}/payments" }}
+      ]
+    },
+    {
+      "name": "User and agent administration",
+      "item": [
+        { "name": "List users [200]", "request": { "method": "GET", "url": "{{baseUrl}}/users?limit=20" }},
+        { "name": "Read seeded user [200]", "request": { "method": "GET", "url": "{{baseUrl}}/users/{{demoUserId}}" }},
+        { "name": "Update seeded user display name [200]", "request": { "method": "PUT", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Demo Standard User\"}" }, "url": "{{baseUrl}}/users/{{demoUserId}}" }},
+        { "name": "Create demo agent [201]", "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"name\":\"Postman Demo Agent\",\"email\":\"agent.{{testRunId}}@example.test\",\"password\":\"{{testUserPassword}}\"}" }, "url": "{{baseUrl}}/users/agents" }},
+        { "name": "Deactivate isolated demo agent [200]", "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\"isActive\":false}" }, "url": "{{baseUrl}}/users/agents/{{createdAgentId}}" }},
+        { "name": "Delete isolated demo agent [200]", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/{{createdAgentId}}" }},
+        { "name": "Delete registered test user [200]", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/{{registeredUserId}}" }},
+        { "name": "Reject standard-user admin endpoint [403]", "request": { "method": "GET", "url": "{{baseUrl}}/users", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] } }},
+        { "name": "Revoke standard-user token [200]", "request": { "method": "POST", "url": "{{baseUrl}}/auth/logout", "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }] } } }
+      ]
+    }
+  ]
+}
