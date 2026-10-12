@@ -19,6 +19,7 @@ function safeUser(user) {
     name: user.name,
     email: user.email,
     role: user.role,
+    isActive: user.isActive !== false,
     ...(user.avatar && { avatar: user.avatar }),
   }
 }
@@ -74,7 +75,7 @@ export const login = asyncHandler(async (req, res) => {
     })
   }
 
-  const user = await User.findOne({ email }).select('+password')
+  const user = await User.findOne({ email, isActive: { $ne: false } }).select('+password')
   const passwordMatches = user && Buffer.byteLength(body.password, 'utf8') <= 72
     ? await bcrypt.compare(body.password, user.password)
     : false
@@ -106,4 +107,9 @@ export const getCurrentUser = asyncHandler(async (req, res) => {
   }
 
   return res.json({ success: true, data: { user: safeUser(user) } })
+})
+
+export const logout = asyncHandler(async (req, res) => {
+  await User.updateOne({ _id: req.user.id }, { $inc: { tokenVersion: 1 } })
+  return res.json({ success: true, message: 'Logout successful.' })
 })

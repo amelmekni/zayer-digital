@@ -15,13 +15,25 @@ const featureIcons = [BarChart3, Users, ShieldCheck, Handshake]
 export default function Home() {
   const { t, language } = useLanguage()
   const content = t.legacy.home
-  const loadServices = useCallback(() => serviceService.getServices(), [])
+  const loadServices = useCallback(async () => {
+    try {
+      return await serviceService.getServices()
+    } catch (requestError) {
+      if (import.meta.env.DEV) {
+        console.error('Home services request failed', {
+          name: requestError?.name || 'Error',
+          status: Number.isInteger(requestError?.status) ? requestError.status : undefined,
+        })
+      }
+      throw requestError
+    }
+  }, [])
   const { data: services, loading, error, reload } = useApiResource(loadServices, [loadServices])
   const stats = content.stats.map(([value, label]) => ({ value, label }))
   const officialServices = getOfficialServices(services)
 
   return <>
-    <PageMeta title="ZAYER Digital — Digital Marketing Agency" description={content.intro} />
+    <PageMeta title={content.title.join(' ')} description={content.intro} />
     <Hero
       video="hero-1.mp4"
       revealOnScroll
@@ -53,7 +65,7 @@ export default function Home() {
           <Link className="legacy-inline-link" to="/contact">{content.servicesCta}<ArrowUpRight size={16} /></Link>
         </Reveal>
         {loading && <LoadingState label={t.common.loading} />}
-        {error && <ErrorState message={error} onRetry={reload} />}
+        {error && <ErrorState message={content.servicesLoadError} retryLabel={content.retry} onRetry={reload} />}
         {!loading && !error && officialServices.length === 0 && <EmptyState message={t.services.empty} />}
         {!loading && !error && officialServices.length > 0 && <div className="legacy-service-grid">
           {officialServices.map((service, index) => {

@@ -45,6 +45,12 @@ const serviceSchema = new mongoose.Schema({
     enum: ['marketing', 'creative', 'development', 'ecommerce', 'technology', 'strategy'],
     index: true,
   },
+  unit: {
+    type: String,
+    trim: true,
+    default: 'service',
+    maxlength: 40,
+  },
   price: {
     type: Number,
     min: 0,

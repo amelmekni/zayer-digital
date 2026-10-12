@@ -27,7 +27,7 @@ MERN application foundation for the ZAYER Digital public website and future admi
 - `npm run dev` starts both processes.
 - `npm run build` builds the client.
 - `npm run seed:admin --workspace zayer-digital-server` creates the configured admin account once.
-- `npm test --workspace zayer-digital-server` runs the backend tests, including authentication, authorization, and the official service catalog checks.
+- See `server/test/README.md` for database-free test commands and separately authorized integration-test procedures. Avoid broad `npm test --workspace zayer-digital-server` discovery: it includes the destructive `auth.test.js` integration test.
 - `GET http://localhost:5099/api/health` reports API and database readiness when using the example environment.
 
 ## Render deployment configuration
@@ -37,9 +37,11 @@ MERN application foundation for the ZAYER Digital public website and future admi
 
 The client API layer reads the bearer token from the single `localStorage` key `zayer_auth_token`; safe user details remain in memory and are reloaded through `/api/auth/me` on refresh. The token is removed automatically after an authenticated request receives `401 Unauthorized`. No password or server-side secret is stored in the client.
 
-The client exposes `/login` and `/register` for the Phase 5 auth API. Registration follows the API contract and does not sign the user in automatically. Reusable `ProtectedRoute` and `AdminRoute` guards are available for protected screens; no admin/dashboard routes are part of Phase 6.
+Payment submissions use a separate `localStorage` record to preserve the exact request body and idempotency key until the API confirms success. Web Locks serialize read/modify/write operations across same-origin tabs; if that API or persistent storage is unavailable, the dashboard refuses to send a payment rather than risk losing its retry key. Saved operations support retries after dashboard reloads and keep multiple unresolved operations distinct. They store payment amount/note and resource identifiers, never authentication tokens or credentials. Browser storage is device/browser-local, may be cleared, and is readable by same-origin JavaScript; treat notes as non-secret and keep the application protected against XSS. If a request outcome is uncertain, retry it from the dashboard's saved-pending-payments list rather than creating another payment with altered details.
 
-The backend currently includes six Mongoose models and REST controllers/routes for services, projects, jobs, applications, contact messages, and users. Public service/project/job reads return active or published content only. Lists support pagination; content lists support filtering, sorting, and search where applicable.
+The client exposes `/login` and `/register` for the Phase 5 auth API. Registration follows the API contract and does not sign the user in automatically. Reusable `ProtectedRoute` and `AdminRoute` guards are available for protected screens. The `/dashboard` route renders the sales dashboard behind `ProtectedRoute`, so it requires authentication; the route itself does not require an admin role.
+
+The backend includes Mongoose models and REST controllers/routes for services, projects, jobs, applications, contact messages, users, sales quotes, quote numbering, retainer collections, and payment idempotency. Public service/project/job reads return active or published content only. Lists support pagination; content lists support filtering, sorting, and search where applicable.
 
 ## Public legacy content migration
 
@@ -61,6 +63,8 @@ Completed: project reorganization (Phase 1), Node/Express/MongoDB configuration 
 
 `JWT_EXPIRES_IN` accepts a duration such as `15m`, `1h`, or `7d` and defaults to `15m`. The admin seed requires non-empty `ADMIN_NAME`, `ADMIN_EMAIL`, and `ADMIN_PASSWORD`; the admin password follows the same password policy as registration.
 
+The `/dashboard` sales workspace and its quote, payment, retainer, and summary endpoints require an authenticated `admin` or `sales_agent`; sales agents are restricted to their own quotes and collections.
+
 ## API routes
 
 - Services: `GET /api/services`, `GET /api/services/:slug`, `POST /api/services`, `PUT /api/services/:id`, `DELETE /api/services/:id`
@@ -69,6 +73,9 @@ Completed: project reorganization (Phase 1), Node/Express/MongoDB configuration 
 - Applications: `POST /api/applications`, `GET /api/applications`, `GET /api/applications/:id`, `PUT /api/applications/:id`
 - Contact: `POST /api/contact`, `GET /api/contact`, `GET /api/contact/:id`, `PUT /api/contact/:id`
 - Users: `GET /api/users`, `GET /api/users/:id`, `PUT /api/users/:id`, `DELETE /api/users/:id`
+- Quotes: `GET /api/quotes`, `POST /api/quotes`, `GET /api/quotes/:id`, `PUT /api/quotes/:id`, `POST /api/quotes/:id/status`, `POST /api/quotes/:id/payments`, `GET /api/quotes/:id/pdf`
+- Retainer collections: `GET /api/retainer-collections`, `POST /api/retainer-collections/:id/payments`
+- Sales dashboard: `GET /api/dashboard/summary`
 - Authentication: `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/auth/me`
 
 Collection endpoints accept `page` and `limit` query parameters (default page `1`, default limit `20`, maximum limit `100`). Search, filter, and sort query parameters are validated by each collection controller.

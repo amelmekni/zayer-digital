@@ -4,7 +4,15 @@ import { Link } from 'react-router-dom'
 
 export default function Hero({ video, label, title, description, primary, secondary, stats, compact = false, revealOnScroll = false }) {
   const [hasScrolled, setHasScrolled] = useState(false)
+  const [reduceMotion, setReduceMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   const videoSrc = video ? `/videos/${video}` : null
+
+  useEffect(() => {
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const updateMotionPreference = (event) => setReduceMotion(event.matches)
+    motionPreference.addEventListener('change', updateMotionPreference)
+    return () => motionPreference.removeEventListener('change', updateMotionPreference)
+  }, [])
 
   useEffect(() => {
     if (!revealOnScroll) return undefined
@@ -20,7 +28,7 @@ export default function Hero({ video, label, title, description, primary, second
 
   return <section className={`hero ${compact ? 'hero-compact' : ''} ${video ? 'hero-video' : ''}`} id="top">
     {video && <div className="hero-video-layer" aria-hidden="true">
-      {videoSrc && <video autoPlay muted loop playsInline preload="none" aria-hidden="true"><source src={videoSrc} type="video/mp4" /></video>}
+      {videoSrc && !reduceMotion && <video autoPlay muted loop playsInline preload="none" aria-hidden="true"><source src={videoSrc} type="video/mp4" /></video>}
     </div>}
     <div className="hero-shade" />
     <div className={`container hero-content ${revealOnScroll ? 'home-hero-content' : ''} ${hasScrolled ? 'is-scroll-revealed' : ''}`}>

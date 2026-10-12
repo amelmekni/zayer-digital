@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext.jsx'
 import { useLanguage } from '../../context/LanguageContext.jsx'
+import { loginAndGetDestination } from '../../utils/authRedirect.js'
 
 export default function AuthPage({ mode }) {
   const isLogin = mode === 'login'
-  const { isAuthenticated, loading, login, register } = useAuth()
+  const { isAuthenticated, user, loading, login, register } = useAuth()
   const { t } = useLanguage()
   const copy = t.auth
   const location = useLocation()
@@ -19,7 +20,9 @@ export default function AuthPage({ mode }) {
     setSuccess('')
   }, [mode])
 
-  if (!loading && isAuthenticated) return <Navigate to="/" replace />
+  if (!loading && isAuthenticated) {
+    return <Navigate to={['admin', 'sales_agent'].includes(user?.role) ? '/dashboard' : '/'} replace />
+  }
 
   const submit = async (event) => {
     event.preventDefault()
@@ -32,8 +35,12 @@ export default function AuthPage({ mode }) {
 
     try {
       if (isLogin) {
-        await login({ email: details.email, password: details.password })
-        navigate(location.state?.from?.pathname || '/', { replace: true })
+        const destination = await loginAndGetDestination(
+          login,
+          { email: details.email, password: details.password },
+          location.state?.from?.pathname,
+        )
+        navigate(destination, { replace: true })
       } else {
         await register({ name: details.name, email: details.email, password: details.password })
         setSuccess(copy.registerSuccess)

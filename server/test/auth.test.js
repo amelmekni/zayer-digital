@@ -4,13 +4,16 @@ import { spawnSync } from 'node:child_process'
 import { after, before, test } from 'node:test'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { validateAuthTestDatabase } from '../utils/testDatabaseSafety.js'
 
 const testDirectory = dirname(fileURLToPath(import.meta.url))
+const safeTestMongoUri = validateAuthTestDatabase({
+  uri: process.env.MONGO_TEST_URI,
+  allowDestructive: process.env.MONGO_TEST_ALLOW_DESTRUCTIVE,
+})
 const testAdminPassword = randomBytes(24).toString('base64url')
 process.env.NODE_ENV = 'test'
-const testMongoUri = new URL(process.env.MONGO_TEST_URI || 'mongodb://127.0.0.1:27017')
-testMongoUri.pathname = `/zayer-digital-auth-test-${process.pid}`
-process.env.MONGO_URI = testMongoUri.href
+process.env.MONGO_URI = safeTestMongoUri
 process.env.JWT_SECRET = randomBytes(48).toString('hex')
 process.env.JWT_EXPIRES_IN = '15m'
 process.env.ADMIN_NAME = 'Seed Test Admin'

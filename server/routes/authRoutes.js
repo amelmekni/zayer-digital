@@ -3,6 +3,7 @@ import rateLimit from 'express-rate-limit'
 import {
   getCurrentUser,
   login,
+  logout,
   register,
 } from '../controllers/authController.js'
 import { authenticate } from '../middleware/authMiddleware.js'
@@ -22,5 +23,6 @@ const authLimiter = rateLimit({
 router.post('/register', authLimiter, register)
 router.post('/login', authLimiter, login)
 router.get('/me', authenticate, getCurrentUser)
+router.post('/logout', authenticate, logout)
 
 export default router

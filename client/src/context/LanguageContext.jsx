@@ -6,12 +6,20 @@ const LanguageContext = createContext(null)
 const dictionaries = { en, fr }
 
 export function LanguageProvider({ children }) {
-  const [language, setLanguage] = useState(() => localStorage.getItem('zayer-digital-language') || 'en')
+  const [language, setLanguage] = useState(() => {
+    const savedLanguage = localStorage.getItem('zayer-digital-language')
+    return Object.hasOwn(dictionaries, savedLanguage) ? savedLanguage : 'en'
+  })
+
+  useEffect(() => {
+    document.documentElement.lang = language
+  }, [language])
+
   const value = useMemo(() => ({
     language,
     setLanguage: (next) => {
+      if (!Object.hasOwn(dictionaries, next)) return
       localStorage.setItem('zayer-digital-language', next)
-      document.documentElement.lang = next
       setLanguage(next)
     },
     t: dictionaries[language] || en,

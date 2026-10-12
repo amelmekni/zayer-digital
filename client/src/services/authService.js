@@ -20,4 +20,7 @@ export const authService = {
   async getMe() {
     return (await request('/auth/me')).data.user
   },
+  async logout() {
+    return request('/auth/logout', { method: 'POST' })
+  },
 }

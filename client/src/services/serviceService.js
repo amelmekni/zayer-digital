@@ -1,6 +1,9 @@
 import { queryString, request } from './api.js'
 
 export const serviceService = {
+  async getManageServices(params) {
+    return (await request(`/services/manage${queryString({ limit: 100, ...params })}`)).data
+  },
   async getServices(params) {
     return (await request(`/services${queryString({ limit: 100, ...params })}`)).data
   },

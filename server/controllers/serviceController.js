@@ -40,6 +40,19 @@ export const getServices = asyncHandler(async (req, res) => {
   })
 })
 
+export const getManageServices = asyncHandler(async (req, res) => {
+  const { page, limit, skip } = parsePagination(req.query)
+  const [services, total] = await Promise.all([
+    Service.find({}).sort(sortOptions.newest).skip(skip).limit(limit).lean(),
+    Service.countDocuments({}),
+  ])
+  return res.json({
+    success: true,
+    data: services,
+    meta: { pagination: paginationMeta(page, limit, total) },
+  })
+})
+
 export const getServiceBySlug = asyncHandler(async (req, res) => {
   const service = await Service.findOne({ slug: req.params.slug, isActive: true }).lean()
   if (!service) {
@@ -62,6 +75,7 @@ export const updateService = asyncHandler(async (req, res) => {
     'icon',
     'image',
     'category',
+    'unit',
     'price',
     'currency',
     'features',

@@ -9,8 +9,10 @@ import ServiceDetails from './pages/public/ServiceDetails.jsx'
 import Portfolio from './pages/public/Portfolio.jsx'
 import Careers from './pages/public/Careers.jsx'
 import Contact from './pages/public/Contact.jsx'
+import SalesDashboard from './pages/public/SalesDashboard.jsx'
 import AuthPage from './pages/public/AuthPage.jsx'
 import NotFound from './pages/public/NotFound.jsx'
+import { ProtectedRoute } from './components/common/ProtectedRoute.jsx'
 
 export default function App() {
   return <>
@@ -27,6 +29,7 @@ export default function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<AuthPage mode="login" />} />
         <Route path="/register" element={<AuthPage mode="register" />} />
+        <Route path="/dashboard" element={<ProtectedRoute><SalesDashboard /></ProtectedRoute>} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

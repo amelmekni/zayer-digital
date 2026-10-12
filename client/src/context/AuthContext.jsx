@@ -53,8 +53,18 @@ export function AuthProvider({ children }) {
   }, [])
 
   const register = useCallback((details) => authService.register(details), [])
-  const logout = useCallback(() => {
-    clearAuthentication()
+  const logout = useCallback(async () => {
+    try {
+      await authService.logout()
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.warn('Server-side logout could not be confirmed', {
+          status: Number.isInteger(error?.status) ? error.status : undefined,
+        })
+      }
+    } finally {
+      clearAuthentication()
+    }
   }, [clearAuthentication])
 
   const value = useMemo(() => ({

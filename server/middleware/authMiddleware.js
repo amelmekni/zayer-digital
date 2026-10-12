@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import User from '../models/User.js'
 import { env } from '../config/env.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
+import { isTokenVersionCurrent } from '../utils/tokenVersion.js'
 
 function unauthorized(res) {
   return res.status(401).json({
@@ -28,15 +29,18 @@ export const authenticate = asyncHandler(async (req, res, next) => {
     || typeof payload !== 'object'
     || typeof payload.userId !== 'string'
     || !mongoose.isValidObjectId(payload.userId)
-    || !['admin', 'user'].includes(payload.role)
+    || !['admin', 'sales_agent', 'user'].includes(payload.role)
+    || (payload.tokenVersion !== undefined && (!Number.isInteger(payload.tokenVersion) || payload.tokenVersion < 0))
   ) {
     return unauthorized(res)
   }
 
   const user = await User.findById(payload.userId)
-    .select('_id name email role avatar')
+    .select('_id name email role avatar isActive tokenVersion')
     .lean()
-  if (!user) return unauthorized(res)
+  if (!user || user.isActive === false || !isTokenVersionCurrent(payload.tokenVersion, user.tokenVersion)) {
+    return unauthorized(res)
+  }
 
   req.user = {
     id: user._id.toString(),

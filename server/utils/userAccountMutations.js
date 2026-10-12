@@ -1,20 +1,24 @@
 export function createUserAccountMutations({ users, withGuard }) {
   return {
     async update({ actorId, targetId, update }) {
-      if (actorId === targetId && update.role === 'user') {
-        return { kind: 'self-demotion' }
-      }
-
       return withGuard(async (session) => {
         const target = await users.findRoleById(targetId, session)
         if (!target) return { kind: 'not-found' }
 
-        if (target.role === 'admin' && update.role === 'user') {
+        const roleChanged = update.role !== undefined && update.role !== target.role
+        if (target.role === 'admin' && roleChanged && actorId === targetId) {
+          return { kind: 'self-demotion' }
+        }
+
+        if (target.role === 'admin' && roleChanged && update.role !== 'admin') {
           const administratorCount = await users.countAdmins(session)
           if (administratorCount <= 1) return { kind: 'last-admin' }
         }
 
-        const user = await users.updateById(targetId, update, session)
+        const accountUpdate = roleChanged
+          ? { ...update, tokenVersion: (target.tokenVersion || 0) + 1 }
+          : update
+        const user = await users.updateById(targetId, accountUpdate, session)
         return user ? { kind: 'updated', user } : { kind: 'not-found' }
       })
     },

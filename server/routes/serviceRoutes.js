@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   createService,
   deleteService,
+  getManageServices,
   getServiceBySlug,
   getServices,
   updateService,
@@ -16,6 +17,7 @@ router.route('/')
   .get(getServices)
   .post(authenticate, requireAdmin, createService)
 
+router.get('/manage', authenticate, requireAdmin, getManageServices)
 router.get('/:slug', getServiceBySlug)
 router.route('/:id')
   .put(authenticate, requireAdmin, validateObjectId(), updateService)

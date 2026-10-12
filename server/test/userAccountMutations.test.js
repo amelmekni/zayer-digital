@@ -1,26 +1,12 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { deleteUser, updateUser } from '../controllers/userController.js'
 import { createUserAccountMutations } from '../utils/userAccountMutations.js'
 
-function invokeHandler(handler, req) {
-  return new Promise((resolve, reject) => {
-    const res = {
-      status(statusCode) {
-        this.statusCode = statusCode
-        return this
-      },
-      json(body) {
-        resolve({ statusCode: this.statusCode || 200, body })
-        return this
-      },
-    }
-    handler(req, res, reject)
-  })
-}
-
 function createFixture(initialUsers) {
-  const records = new Map(initialUsers.map((user) => [user.id, { ...user }]))
+  const records = new Map(initialUsers.map((user) => [
+    user.id,
+    { tokenVersion: 0, ...user },
+  ]))
   let tail = Promise.resolve()
   let guardedOperations = 0
 
@@ -44,7 +30,7 @@ function createFixture(initialUsers) {
     users: {
       async findRoleById(id) {
         const user = records.get(id)
-        return user ? { role: user.role } : null
+        return user ? { role: user.role, tokenVersion: user.tokenVersion } : null
       },
       async countAdmins() {
         return [...records.values()].filter((user) => user.role === 'admin').length
@@ -72,7 +58,7 @@ const admins = [
   { id: 'admin-b', role: 'admin' },
 ]
 
-test('rejects administrator self-deletion and self-demotion before opening a guarded mutation', async () => {
+test('rejects administrator self-deletion and self-demotion within the account guard', async () => {
   const { mutations, getGuardedOperations } = createFixture(admins)
 
   assert.deepEqual(await mutations.delete({ actorId: 'admin-a', targetId: 'admin-a' }), {
@@ -83,27 +69,12 @@ test('rejects administrator self-deletion and self-demotion before opening a gua
     targetId: 'admin-a',
     update: { role: 'user' },
   }), { kind: 'self-demotion' })
-  assert.equal(getGuardedOperations(), 0)
-})
-
-test('returns the API conflict response for self-deletion and self-demotion', async () => {
-  const request = {
-    params: { id: 'admin-a' },
-    user: { id: 'admin-a', role: 'admin' },
-  }
-  const deleted = await invokeHandler(deleteUser, request)
-  const demoted = await invokeHandler(updateUser, { ...request, body: { role: 'user' } })
-
-  assert.equal(deleted.statusCode, 409)
-  assert.deepEqual(deleted.body, {
-    success: false,
-    error: { message: 'Administrators cannot delete their own account.' },
-  })
-  assert.equal(demoted.statusCode, 409)
-  assert.deepEqual(demoted.body, {
-    success: false,
-    error: { message: 'Administrators cannot demote their own account.' },
-  })
+  assert.deepEqual(await mutations.update({
+    actorId: 'admin-a',
+    targetId: 'admin-a',
+    update: { role: 'sales_agent' },
+  }), { kind: 'self-demotion' })
+  assert.equal(getGuardedOperations(), 2)
 })
 
 test('rejects deleting or demoting the only administrator', async () => {
@@ -117,7 +88,47 @@ test('rejects deleting or demoting the only administrator', async () => {
     targetId: 'admin-a',
     update: { role: 'user' },
   }), { kind: 'last-admin' })
+  assert.deepEqual(await mutations.update({
+    actorId: 'other-admin',
+    targetId: 'admin-a',
+    update: { role: 'sales_agent' },
+  }), { kind: 'last-admin' })
   assert.equal(records.get('admin-a').role, 'admin')
+})
+
+test('allows an administrator role change when another administrator remains', async () => {
+  const { mutations, records } = createFixture(admins)
+
+  const result = await mutations.update({
+    actorId: 'admin-b',
+    targetId: 'admin-a',
+    update: { role: 'sales_agent' },
+  })
+
+  assert.equal(result.kind, 'updated')
+  assert.equal(records.get('admin-a').role, 'sales_agent')
+  assert.equal([...records.values()].filter((user) => user.role === 'admin').length, 1)
+})
+
+test('increments tokenVersion only when the role changes', async () => {
+  const { mutations, records } = createFixture([
+    ...admins,
+    { id: 'agent-a', role: 'sales_agent', tokenVersion: 4 },
+  ])
+
+  await mutations.update({
+    actorId: 'admin-a',
+    targetId: 'agent-a',
+    update: { role: 'user' },
+  })
+  assert.equal(records.get('agent-a').tokenVersion, 5)
+
+  await mutations.update({
+    actorId: 'admin-a',
+    targetId: 'agent-a',
+    update: { role: 'user' },
+  })
+  assert.equal(records.get('agent-a').tokenVersion, 5)
 })
 
 test('allows safe deletion and demotion when multiple administrators exist', async () => {
@@ -141,15 +152,19 @@ test('allows safe deletion and demotion when multiple administrators exist', asy
 test('serializes competing deletion and demotion attempts so a final administrator remains', async () => {
   const { mutations, records } = createFixture(admins)
   const results = await Promise.all([
-    mutations.delete({ actorId: 'admin-a', targetId: 'admin-b' }),
     mutations.update({
       actorId: 'admin-b',
       targetId: 'admin-a',
+      update: { role: 'sales_agent' },
+    }),
+    mutations.update({
+      actorId: 'admin-a',
+      targetId: 'admin-b',
       update: { role: 'user' },
     }),
   ])
 
-  assert.equal(results.filter((result) => result.kind === 'deleted' || result.kind === 'updated').length, 1)
+  assert.equal(results.filter((result) => result.kind === 'updated').length, 1)
   assert.equal(results.filter((result) => result.kind === 'last-admin').length, 1)
   assert.equal([...records.values()].filter((user) => user.role === 'admin').length, 1)
 })

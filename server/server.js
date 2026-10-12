@@ -9,8 +9,11 @@ import authRoutes from './routes/authRoutes.js'
 import contactRoutes from './routes/contactRoutes.js'
 import jobRoutes from './routes/jobRoutes.js'
 import projectRoutes from './routes/projectRoutes.js'
+import quoteRoutes from './routes/quoteRoutes.js'
+import retainerCollectionRoutes from './routes/retainerCollectionRoutes.js'
 import serviceRoutes from './routes/serviceRoutes.js'
 import userRoutes from './routes/userRoutes.js'
+import dashboardRoutes from './routes/dashboardRoutes.js'
 import { pathToFileURL } from 'node:url'
 
 const app = express()
@@ -40,6 +43,9 @@ app.use('/api/auth', authRoutes)
 app.use('/api/services', serviceRoutes)
 app.use('/api/projects', projectRoutes)
 app.use('/api/jobs', jobRoutes)
+app.use('/api/quotes', quoteRoutes)
+app.use('/api/retainer-collections', retainerCollectionRoutes)
+app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/applications', applicationRoutes)
 app.use('/api/contact', contactRoutes)
 app.use('/api/users', userRoutes)

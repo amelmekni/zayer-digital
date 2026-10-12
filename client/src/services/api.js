@@ -28,19 +28,23 @@ function safeMessage(payload, status) {
       ? 'An account with this email already exists.'
       : 'This request conflicts with an existing record.'
   }
-  if (status === 400 && Array.isArray(payload?.error?.details) && payload.error.details.length) {
-    const validationMessage = payload.error.details[0]?.message
-    if (typeof validationMessage === 'string' && validationMessage.trim()) return validationMessage
-  }
-  if (typeof message === 'string' && message.trim()) return message
   if (status === 401) return 'Your session has expired. Please sign in again.'
   if (status === 403) return 'You are not authorized to perform this action.'
   if (status === 404) return 'The requested content could not be found.'
+  if (status === 429) return 'Too many requests. Please wait a moment and try again.'
   if (status === 400) return 'Please check the information and try again.'
   return 'Something went wrong. Please try again.'
 }
 
-export async function request(path, { method = 'GET', body, headers = {}, auth = true, handleUnauthorized = true, ...options } = {}) {
+export async function request(path, {
+  method = 'GET',
+  body,
+  headers = {},
+  auth = true,
+  handleUnauthorized = true,
+  responseType = 'json',
+  ...options
+} = {}) {
   const apiBaseUrl = import.meta.env?.VITE_API_URL?.trim()
   if (!apiBaseUrl) throw new ApiError('The API URL is not configured. Set VITE_API_URL in client/.env.')
   const requestHeaders = new Headers(headers)
@@ -63,6 +67,9 @@ export async function request(path, { method = 'GET', body, headers = {}, auth =
   }
 
   let payload
+  if (responseType === 'blob' && response.ok) {
+    return response.blob()
+  }
   try {
     payload = response.status === 204 ? null : await response.json()
   } catch {

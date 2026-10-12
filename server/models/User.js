@@ -24,9 +24,19 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'user'],
+    enum: ['admin', 'sales_agent', 'user'],
     default: 'user',
     required: true,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+    index: true,
+  },
+  tokenVersion: {
+    type: Number,
+    default: 0,
+    min: 0,
   },
   avatar: {
     type: String,

@@ -1,5 +1,5 @@
-import { useRef, useState } from 'react'
-import { ArrowUpRight, Clock3, Globe2, Mail, MapPin, Phone } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowUpRight, CircleAlert, Clock3, Globe2, Mail, MapPin, Phone } from 'lucide-react'
 import LegacyPageHero from '../../components/sections/LegacyPageHero.jsx'
 import Toast from '../../components/common/Toast.jsx'
 import Reveal from '../../components/common/Reveal.jsx'
@@ -10,17 +10,23 @@ import { contactService } from '../../services/contactService.js'
 export default function Contact() {
   const { t } = useLanguage()
   const content = t.legacy.contact
+  const validation = content.validation
   const [toast, setToast] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [submitError, setSubmitError] = useState('')
+  const [submitError, setSubmitError] = useState(null)
+  const [errorVisible, setErrorVisible] = useState(false)
   const submitLock = useRef(false)
+  const hasFieldError = (field) => errorVisible && submitError?.field === field
+
+  useEffect(() => {
+    if (!submitError || errorVisible) return
+    const timeout = window.setTimeout(() => setSubmitError(null), 250)
+    return () => window.clearTimeout(timeout)
+  }, [errorVisible, submitError])
 
   const submit = async (event) => {
     event.preventDefault()
     if (submitLock.current) return
-    submitLock.current = true
-    setSubmitting(true)
-    setSubmitError('')
 
     const form = event.currentTarget
     const values = new FormData(form)
@@ -33,13 +39,28 @@ export default function Contact() {
       message: String(values.get('message') || '').trim(),
     }
 
+    if (payload.message.length < 5 || payload.message.length > 10000) {
+      setSubmitError({
+        field: 'message',
+        message: payload.message.length < 5 ? validation.messageTooShort : validation.messageTooLong,
+        hint: payload.message.length < 5 ? validation.messageMinimum : undefined,
+      })
+      setErrorVisible(true)
+      return
+    }
+
+    submitLock.current = true
+    setSubmitting(true)
+    setErrorVisible(false)
+
     try {
       await contactService.createContact(payload)
       form.reset()
       setToast(content.success)
       window.setTimeout(() => setToast(''), 5000)
     } catch (requestError) {
-      setSubmitError(requestError.message)
+      setSubmitError(getFriendlyContactError(requestError, payload.message, validation))
+      setErrorVisible(true)
     } finally {
       submitLock.current = false
       setSubmitting(false)
@@ -95,18 +116,29 @@ export default function Contact() {
         <Reveal>
           <div className="legacy-contact-form-wrap">
             <h3>{content.formTitle}</h3><p>{content.formCopy}</p>
-            <form onSubmit={submit}>
+            <form onSubmit={submit} onChange={() => errorVisible && setErrorVisible(false)}>
               <div className="legacy-form-row">
-                <label className="legacy-field"><span>{content.firstName} *</span><input name="firstName" autoComplete="given-name" required /></label>
-                <label className="legacy-field"><span>{content.lastName} *</span><input name="lastName" autoComplete="family-name" required /></label>
+                <label className="legacy-field"><span>{content.firstName} *</span><input name="firstName" autoComplete="given-name" required aria-invalid={hasFieldError('name')} aria-describedby={hasFieldError('name') ? 'contact-form-error' : undefined} /></label>
+                <label className="legacy-field"><span>{content.lastName} *</span><input name="lastName" autoComplete="family-name" required aria-invalid={hasFieldError('name')} aria-describedby={hasFieldError('name') ? 'contact-form-error' : undefined} /></label>
               </div>
               <div className="legacy-form-row">
-                <label className="legacy-field"><span>{content.email} *</span><input name="email" type="email" autoComplete="email" required /></label>
-                <label className="legacy-field"><span>{content.phoneLabel}</span><input name="phone" type="tel" autoComplete="tel" /></label>
+                <label className="legacy-field"><span>{content.email} *</span><input name="email" type="email" autoComplete="email" required aria-invalid={hasFieldError('email')} aria-describedby={hasFieldError('email') ? 'contact-form-error' : undefined} /></label>
+                <label className="legacy-field"><span>{content.phoneLabel}</span><input name="phone" type="tel" autoComplete="tel" aria-invalid={hasFieldError('phone')} aria-describedby={hasFieldError('phone') ? 'contact-form-error' : undefined} /></label>
               </div>
-              <label className="legacy-field"><span>{content.company}</span><input name="company" autoComplete="organization" /></label>
-              <label className="legacy-field"><span>{content.message} *</span><textarea name="message" rows="5" required /></label>
-              {submitError && <p className="legacy-form-error" role="alert">{submitError}</p>}
+              <label className="legacy-field"><span>{content.company}</span><input name="company" autoComplete="organization" aria-invalid={hasFieldError('company')} aria-describedby={hasFieldError('company') ? 'contact-form-error' : undefined} /></label>
+              <label className="legacy-field"><span>{content.message} *</span><textarea name="message" rows="5" required aria-invalid={hasFieldError('message')} aria-describedby={hasFieldError('message') ? 'contact-form-error' : undefined} /></label>
+              <div
+                id="contact-form-error"
+                className={`legacy-form-error legacy-contact-error${errorVisible ? ' is-visible' : ''}`}
+                role="alert"
+                aria-atomic="true"
+                aria-hidden={!errorVisible}
+              >
+                {submitError && <>
+                  <CircleAlert size={17} aria-hidden="true" />
+                  <span>{submitError.message}{submitError.hint && <small>{submitError.hint}</small>}</span>
+                </>}
+              </div>
               <button className="legacy-button legacy-button-gold" type="submit" disabled={submitting}>
                 {submitting ? t.contact.submitting : content.send}<ArrowUpRight size={17} />
               </button>
@@ -118,6 +150,26 @@ export default function Contact() {
     </section>
     <Toast message={toast} onClose={() => setToast('')} />
   </>
+}
+
+function getFriendlyContactError(error, message, validation) {
+  const fields = validation.fields
+  const field = Array.isArray(error?.details)
+    ? error.details.find((detail) => typeof detail?.field === 'string' && Object.hasOwn(fields, detail.field))?.field
+    : null
+
+  if (field === 'message' && message.length < 5) {
+    return { field, message: validation.messageTooShort, hint: validation.messageMinimum }
+  }
+  if (field === 'message' && message.length > 10000) {
+    return { field, message: validation.messageTooLong }
+  }
+  if (field) return { field, message: fields[field] }
+
+  if (error?.status === 400) return { field: null, message: validation.invalidForm }
+  if (error?.status === 409) return { field: null, message: validation.conflict }
+  if (error?.status === 429) return { field: null, message: validation.rateLimited }
+  return { field: null, message: validation.generic }
 }
 
 function ContactDetail({ icon, label, children }) {

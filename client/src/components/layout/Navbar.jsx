@@ -30,12 +30,15 @@ export default function Navbar() {
       <Link className="brand" to="/" aria-label="ZAYER.Digital home">
         <span className="brand-name">ZAYER<span className="brand-dot">.</span><span className="brand-word">Digital</span></span>
       </Link>
-      <nav className={`primary-nav ${open ? 'nav-open' : ''}`} aria-label="Main navigation">
+      <nav id="primary-navigation" className={`primary-nav ${open ? 'nav-open' : ''}`} aria-label="Main navigation">
         {routes.map(([key, to]) => key === 'services'
           ? <Link key={to} to={to} className={`nav-link ${location.pathname === '/services' ? 'active' : ''}`}>{t.nav[key]}</Link>
           : <NavLink key={to} to={to} end={to === '/'}>{t.nav[key]}</NavLink>)}
         {user
-          ? <button className="mobile-contact mobile-auth-action" type="button" onClick={logout}>{t.auth.logoutAction}</button>
+          ? <>
+            {['admin', 'sales_agent'].includes(user.role) && <Link className="mobile-contact mobile-auth-action" to="/dashboard">{t.workspace.title}<ArrowUpRight size={16} /></Link>}
+            <button className="mobile-contact mobile-auth-action" type="button" onClick={logout}>{t.auth.logoutAction}</button>
+          </>
           : <Link className="mobile-contact mobile-auth-action" to="/login">{t.auth.loginAction}<ArrowUpRight size={16} /></Link>}
         <Link className="mobile-contact" to="/contact">{t.nav.contact}<ArrowUpRight size={16} /></Link>
         <div className="mobile-language"><LanguageSwitcher /></div>
@@ -43,11 +46,14 @@ export default function Navbar() {
       <div className="nav-actions">
         <LanguageSwitcher />
         {user
-          ? <button className="nav-account" type="button" onClick={logout}>{t.auth.logoutAction}</button>
+          ? <>
+            {['admin', 'sales_agent'].includes(user.role) && <Link className="nav-account" to="/dashboard">{t.workspace.title}</Link>}
+            <button className="nav-account" type="button" onClick={logout}>{t.auth.logoutAction}</button>
+          </>
           : <Link className="nav-account" to="/login">{t.auth.loginAction}</Link>}
         <Link className="button button-nav" to="/contact">{t.nav.contact}<ArrowUpRight size={15} /></Link>
       </div>
-      <button className="menu-toggle" type="button" aria-label={open ? t.nav.close : t.nav.menu} aria-expanded={open} onClick={() => setOpen(!open)}>
+      <button className="menu-toggle" type="button" aria-label={open ? t.nav.close : t.nav.menu} aria-expanded={open} aria-controls="primary-navigation" onClick={() => setOpen(!open)}>
         {open ? <X size={22} /> : <Menu size={22} />}
       </button>
     </div>
