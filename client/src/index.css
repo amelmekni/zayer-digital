@@ -482,6 +482,82 @@ h1, h2, h3, .brand-mark { font-family: "Playfair Display", Georgia, serif; }
 .legacy-contact-form-wrap form { display: grid; gap: 20px; }
 .legacy-contact-form-wrap .legacy-form-row { gap: 14px; }
 .legacy-form-disclaimer { margin: -6px 0 0; color: var(--navy-mid); font-size: 11px; line-height: 1.6; text-align: center; }
+.portfolio-hero { padding-top: 145px; padding-bottom: 34px; }
+.portfolio-hero::before { position: absolute; inset: 0; background: radial-gradient(ellipse at 78% 42%, color-mix(in srgb, var(--gold) 13%, transparent), transparent 38%); content: ""; pointer-events: none; }
+.portfolio-hero .container { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 42px; }
+.portfolio-hero .legacy-breadcrumb { grid-column: 1 / -1; margin-bottom: 0; }
+.portfolio-hero-copy { max-width: 740px; }
+.portfolio-kicker { display: inline-flex; align-items: center; gap: 12px; color: var(--gold); font-size: 10px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.portfolio-kicker::before { width: 28px; height: 1px; background: var(--gold); content: ""; }
+.portfolio-hero h1 { margin-top: 20px; font-family: "Playfair Display", Georgia, serif; font-size: clamp(44px, 6vw, 76px); letter-spacing: -.035em; }
+.portfolio-hero-copy > p { max-width: 590px; margin: 22px 0 0; }
+.portfolio-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-top: 28px; }
+.portfolio-hero-secondary { display: inline-flex; align-items: center; gap: 9px; color: var(--white); font-size: 12px; font-weight: 600; }
+.portfolio-hero-secondary svg { color: var(--gold); transition: transform .2s; }
+.portfolio-hero-secondary:hover svg { transform: translateY(3px); }
+.portfolio-hero-stats { display: flex; align-self: end; flex-direction: column; min-width: 175px; border-left: 1px solid color-mix(in srgb, var(--white) 18%, transparent); }
+.portfolio-hero-stat { display: grid; gap: 5px; padding: 14px 0 14px 22px; border-bottom: 1px solid color-mix(in srgb, var(--white) 12%, transparent); }
+.portfolio-hero-stat:last-child { border-bottom: 0; }
+.portfolio-hero-stat strong { color: var(--gold); font-family: "Playfair Display", Georgia, serif; font-size: 27px; line-height: 1; }
+.portfolio-hero-stat span { color: color-mix(in srgb, var(--white) 68%, transparent); font-size: 10px; }
+.portfolio-section-intro { max-width: 600px; margin: -20px 0 36px; color: var(--navy-mid); font-size: 14px; line-height: 1.8; }
+.portfolio-services-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--light-grey); border-left: 1px solid var(--light-grey); }
+.portfolio-service-card { position: relative; display: flex; min-height: 245px; flex-direction: column; padding: 27px 28px; border-right: 1px solid var(--light-grey); border-bottom: 1px solid var(--light-grey); background: var(--white); transition: background .25s, box-shadow .25s, transform .25s; }
+.portfolio-service-card:hover { z-index: 1; background: var(--off-white); box-shadow: 0 14px 34px color-mix(in srgb, var(--navy) 8%, transparent); transform: translateY(-3px); }
+.portfolio-card-index { color: var(--gold); font-family: "Playfair Display", Georgia, serif; font-size: 25px; }
+.portfolio-service-card h3 { margin: 24px 0 9px; color: var(--navy); font-family: "Playfair Display", Georgia, serif; font-size: 21px; line-height: 1.25; }
+.portfolio-service-card p { margin: 0 0 19px; color: var(--navy-mid); font-size: 12px; line-height: 1.75; }
+.portfolio-service-card > a { display: inline-flex; align-items: center; gap: 7px; margin-top: auto; color: var(--navy); font-size: 11px; font-weight: 700; }
+.portfolio-service-card > a svg { color: var(--gold); transition: transform .2s; }
+.portfolio-service-card > a:hover svg { transform: translate(2px, -2px); }
+.portfolio-catalog-note { margin: 18px 0 0; color: var(--navy-mid); font-size: 12px; }
+.portfolio-quote-section { scroll-margin-top: 90px; }
+.portfolio-centered-title { margin-bottom: 44px; text-align: center; }
+.portfolio-centered-title .legacy-eyebrow { justify-content: center; }
+.portfolio-centered-title > p { max-width: 650px; margin: 18px auto 0; color: var(--navy-mid); font-size: 14px; line-height: 1.75; }
+.portfolio-quote-form { display: grid; grid-template-columns: minmax(0, 1fr) 340px; align-items: start; gap: 26px; }
+.portfolio-quote-main { display: grid; gap: 22px; }
+.portfolio-quote-step { padding: 28px; border: 1px solid var(--light-grey); background: var(--white); }
+.portfolio-quote-step-heading { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 23px; }
+.portfolio-quote-step-heading > span { color: var(--gold); font-family: "Playfair Display", Georgia, serif; font-size: 23px; line-height: 1; }
+.portfolio-quote-step-heading h3 { margin: 0 0 5px; color: var(--navy); font-size: 18px; }
+.portfolio-quote-step-heading p { margin: 0; color: var(--navy-mid); font-size: 12px; line-height: 1.65; }
+.portfolio-quote-service { margin-top: 9px; border: 1px solid var(--light-grey); background: var(--white); transition: border-color .2s, background .2s; }
+.portfolio-quote-service.is-selected { border-color: var(--gold); background: var(--off-white); }
+.portfolio-quote-service-choice { display: flex; min-height: 74px; align-items: center; gap: 13px; padding: 13px 15px; cursor: pointer; }
+.portfolio-quote-service-choice input { width: 19px; height: 19px; flex: 0 0 19px; accent-color: var(--navy); }
+.portfolio-quote-service-copy { display: grid; flex: 1; gap: 4px; min-width: 0; }
+.portfolio-quote-service-copy strong { color: var(--navy); font-size: 13px; }
+.portfolio-quote-service-copy small { color: var(--navy-mid); font-size: 11px; line-height: 1.5; }
+.portfolio-quote-service-price { color: var(--navy-light); font-size: 11px; font-weight: 700; text-align: right; }
+.portfolio-quote-quantity { display: flex; align-items: center; justify-content: flex-end; gap: 11px; padding: 0 15px 12px; color: var(--navy-mid); font-size: 11px; }
+.portfolio-quote-quantity input { width: 86px; min-height: 36px; padding: 7px 9px; border: 1px solid var(--light-grey); border-radius: 2px; background: var(--white); }
+.portfolio-quote-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.portfolio-quote-field { display: grid; gap: 7px; min-width: 0; color: var(--navy); font-size: 12px; font-weight: 600; }
+.portfolio-quote-field-wide { grid-column: 1 / -1; }
+.portfolio-quote-field input, .portfolio-quote-field select, .portfolio-quote-field textarea { width: 100%; min-height: 45px; padding: 11px 12px; border: 1px solid #cbd3df; border-radius: 2px; color: var(--navy); background: var(--white); font: 13px "DM Sans", sans-serif; }
+.portfolio-quote-field textarea { min-height: 130px; resize: vertical; }
+.portfolio-quote-field > small { color: var(--navy-mid); font-size: 10px; font-weight: 400; line-height: 1.5; }
+.portfolio-quote-field input:focus-visible, .portfolio-quote-field select:focus-visible, .portfolio-quote-field textarea:focus-visible, .portfolio-quote-quantity input:focus-visible { outline: 2px solid var(--navy-light); outline-offset: 2px; }
+.portfolio-quote-summary { position: sticky; top: 110px; padding: 27px; color: var(--white); background: var(--navy); }
+.portfolio-quote-summary-label { color: var(--gold); font-size: 9px; font-weight: 700; letter-spacing: .18em; text-transform: uppercase; }
+.portfolio-quote-summary h3 { margin: 10px 0 22px; color: var(--white); font-family: "Playfair Display", Georgia, serif; font-size: 25px; }
+.portfolio-quote-summary-lines { display: grid; gap: 13px; margin: 0; padding: 0; list-style: none; }
+.portfolio-quote-summary-lines li { display: flex; justify-content: space-between; gap: 14px; padding-bottom: 12px; border-bottom: 1px solid color-mix(in srgb, var(--white) 15%, transparent); font-size: 11px; line-height: 1.55; }
+.portfolio-quote-summary-lines li > span { min-width: 0; }
+.portfolio-quote-summary-lines small { color: var(--gold-light); white-space: nowrap; }
+.portfolio-quote-summary-lines strong { flex: 0 0 auto; color: var(--gold-light); font-size: 10px; text-align: right; }
+.portfolio-quote-summary-empty { color: color-mix(in srgb, var(--white) 66%, transparent); font-size: 12px; line-height: 1.7; }
+.portfolio-quote-summary-total { display: flex; justify-content: space-between; gap: 10px; margin-top: 19px; padding-top: 17px; border-top: 1px solid color-mix(in srgb, var(--white) 25%, transparent); color: var(--gold-light); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.portfolio-quote-summary-total strong { color: var(--gold); font-family: "Playfair Display", Georgia, serif; font-size: 19px; white-space: nowrap; }
+.portfolio-quote-disclaimer { margin: 17px 0 20px; color: color-mix(in srgb, var(--white) 68%, transparent); font-size: 10px; line-height: 1.65; }
+.portfolio-quote-summary .legacy-form-error { margin: 12px 0; font-size: 11px; line-height: 1.5; }
+.portfolio-quote-success { margin: 12px 0; padding: 11px 12px; border-left: 3px solid var(--gold); color: var(--white); background: color-mix(in srgb, var(--white) 9%, transparent); font-size: 11px; line-height: 1.6; }
+.portfolio-quote-actions { display: grid; gap: 9px; }
+.portfolio-quote-actions .legacy-button { width: 100%; min-height: 47px; padding: 8px 12px; font-size: 11px; }
+.portfolio-quote-secondary { border-color: color-mix(in srgb, var(--white) 30%, transparent); color: var(--white); background: transparent; }
+.portfolio-quote-secondary:hover { border-color: var(--gold); color: var(--gold-light); }
+.portfolio-quote-actions .legacy-button:focus-visible, .portfolio-hero-actions a:focus-visible, .portfolio-hero-secondary:focus-visible, .portfolio-service-card > a:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 .legacy-portfolio-services-list { display: grid; max-width: 850px; gap: 12px; margin: 0 auto; }
 .legacy-portfolio-service { padding: 18px 21px; border: 1px solid var(--light-grey); background: var(--white); }
 .legacy-portfolio-service > button { display: flex; width: 100%; align-items: center; gap: 13px; border: 0; padding: 0; color: var(--navy); background: transparent; text-align: left; cursor: pointer; }
@@ -570,6 +646,10 @@ h1, h2, h3, .brand-mark { font-family: "Playfair Display", Georgia, serif; }
   .legacy-contact-info { padding-right: 25px; }
   .legacy-contact-form-wrap { padding-left: 25px; }
   .legacy-footer-top { gap: 28px; }
+  .portfolio-services-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .portfolio-quote-form { grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; }
+  .portfolio-quote-step { padding: 23px; }
+  .portfolio-quote-summary { padding: 23px; }
 }
 @media (max-width: 700px) {
   .nav-shell { width: calc(100% - 40px); height: 72px; }
@@ -650,6 +730,27 @@ h1, h2, h3, .brand-mark { font-family: "Playfair Display", Georgia, serif; }
   .legacy-quote-item { gap: 8px; padding: 12px 10px; }
   .legacy-quote-item span, .legacy-quote-item strong { font-size: 11px; }
   .legacy-quote-total { padding: 18px; }
+  .portfolio-hero { padding-top: 123px; padding-bottom: 25px; }
+  .portfolio-hero .container { grid-template-columns: 1fr; gap: 25px; }
+  .portfolio-hero .legacy-breadcrumb { grid-column: auto; }
+  .portfolio-hero h1 { font-size: clamp(39px, 10vw, 55px); }
+  .portfolio-hero-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid color-mix(in srgb, var(--white) 18%, transparent); border-left: 0; }
+  .portfolio-hero-stat { align-content: center; padding: 15px 10px 8px; border-bottom: 0; }
+  .portfolio-hero-stat + .portfolio-hero-stat { border-left: 1px solid color-mix(in srgb, var(--white) 14%, transparent); }
+  .portfolio-hero-stat strong { font-size: 23px; }
+  .portfolio-hero-stat span { font-size: 8px; line-height: 1.4; }
+  .portfolio-hero-actions { gap: 16px; }
+  .portfolio-services-grid { grid-template-columns: 1fr 1fr; }
+  .portfolio-service-card { min-height: 240px; padding: 20px 17px; }
+  .portfolio-service-card h3 { font-size: 18px; }
+  .portfolio-quote-form { grid-template-columns: 1fr; }
+  .portfolio-quote-summary { position: static; }
+  .portfolio-quote-step { padding: 20px 16px; }
+  .portfolio-quote-fields { grid-template-columns: 1fr; }
+  .portfolio-quote-field-wide { grid-column: auto; }
+  .portfolio-quote-service-choice { align-items: flex-start; gap: 10px; padding: 12px 10px; }
+  .portfolio-quote-service-choice input { margin-top: 1px; }
+  .portfolio-quote-service-price { max-width: 100px; font-size: 10px; }
   .legacy-footer { padding: 58px 0 22px; }
   .legacy-footer-top { grid-template-columns: 1fr 1fr; gap: 28px 20px; }
   .legacy-footer-brand { grid-column: 1 / -1; }
@@ -658,7 +759,13 @@ h1, h2, h3, .brand-mark { font-family: "Playfair Display", Georgia, serif; }
   .legacy-lightbox-iframe { width: 92vw; height: 52vw; }
 }
 @media (max-width: 420px) {
-  .hero:not(.hero-compact) .hero-content { padding-bottom: 225px; }
+  .hero:not(.hero-compact) .hero-content { padding-bottom: 225px;     .portfolio-services-grid { grid-template-columns: 1fr; }
+    .portfolio-service-card { min-height: 0; }
+    .portfolio-hero-stat { padding-inline: 5px; }
+    .portfolio-hero-stat strong { font-size: 20px; }
+    .portfolio-hero-stat span { font-size: 7px; }
+    .portfolio-quote-summary { padding: 22px 18px; }
+  }
   .hero:not(.hero-compact) h1 { font-size: 42px; }
   .hero-stat { padding-inline: 4px; }
   .hero-stat strong { font-size: 22px; }

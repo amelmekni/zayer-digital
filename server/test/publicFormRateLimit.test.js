@@ -40,7 +40,31 @@ after(async () => {
 })
 
 test('public form POSTs are independently limited without limiting GET routes', async () => {
-  for (const path of ['/api/contact', '/api/applications']) {
+  const contactPaths = [
+    '/api/contact',
+    '/api/contact/quote-request',
+    '/api/contact/quote-request/pdf',
+  ]
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    const response = await fetch(`${baseUrl}${contactPaths[attempt % contactPaths.length]}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{}',
+    })
+    assert.equal(response.status, 400)
+  }
+  const contactLimitedResponse = await fetch(`${baseUrl}/api/contact/quote-request/pdf`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: '{}',
+  })
+  assert.equal(contactLimitedResponse.status, 429)
+  assert.deepEqual(await contactLimitedResponse.json(), {
+    success: false,
+    error: { message: 'Too many form submissions. Try again later.' },
+  })
+
+  for (const path of ['/api/applications']) {
     for (let attempt = 1; attempt <= 5; attempt += 1) {
       const response = await fetch(`${baseUrl}${path}`, {
         method: 'POST',
@@ -49,17 +73,12 @@ test('public form POSTs are independently limited without limiting GET routes', 
       })
       assert.equal(response.status, 400)
     }
-
     const limitedResponse = await fetch(`${baseUrl}${path}`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: '{}',
     })
     assert.equal(limitedResponse.status, 429)
-    assert.deepEqual(await limitedResponse.json(), {
-      success: false,
-      error: { message: 'Too many form submissions. Try again later.' },
-    })
   }
 
   for (const path of ['/api/contact', '/api/applications']) {

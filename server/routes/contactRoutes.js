@@ -1,6 +1,8 @@
 import { Router } from 'express'
 import {
   createContactMessage,
+  createPublicQuoteRequest,
+  downloadPublicQuoteRequestPdf,
   getContactMessageById,
   getContactMessages,
   updateContactMessage,
@@ -16,6 +18,9 @@ const contactSubmissionLimiter = createPublicFormLimiter()
 router.route('/')
   .post(contactSubmissionLimiter, createContactMessage)
   .get(authenticate, requireAdmin, getContactMessages)
+
+router.post('/quote-request', contactSubmissionLimiter, createPublicQuoteRequest)
+router.post('/quote-request/pdf', contactSubmissionLimiter, downloadPublicQuoteRequestPdf)
 
 router.route('/:id')
   .get(authenticate, requireAdmin, validateObjectId(), getContactMessageById)
