@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { ArrowDownRight, ArrowUpRight } from 'lucide-react'
+import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import PageMeta from '../../components/common/PageMeta.jsx'
 import Reveal from '../../components/common/Reveal.jsx'
@@ -58,18 +58,26 @@ export default function Services() {
         {!loading && !error && services.length > 0 && <div className="services-editorial-grid">
           {services.map((service, index) => {
             const Icon = serviceIcons[service.icon] || serviceIcons.Sparkles
-            return <Reveal key={service._id || service.slug} delay={index * 45}>
-              <Link className="services-editorial-item" to={`/services/${service.slug}`}>
+            const title = getServiceTitle(service, language, t)
+            return <Reveal key={service._id || service.slug} delay={index * 55}>
+              <article className="services-card">
                 <div className="services-editorial-top">
                   <span className="services-editorial-number">{String(index + 1).padStart(2, '0')}</span>
-                  <Icon size={23} strokeWidth={1.45} aria-hidden="true" />
+                  <span className="services-card-icon"><Icon size={23} strokeWidth={1.45} aria-hidden="true" /></span>
                 </div>
                 <div className="services-editorial-copy">
-                  <h3>{getServiceTitle(service, language, t)}</h3>
+                  <h3>{title}</h3>
                   <p>{getServiceDescription(service, language, t, true)}</p>
                 </div>
-                <span className="services-editorial-link" aria-label={`${content.discover}: ${getServiceTitle(service, language, t)}`}><ArrowUpRight size={18} /></span>
-              </Link>
+                <Link
+                  className="services-discover"
+                  to={`/services/${encodeURIComponent(service.slug)}`}
+                  aria-label={`${content.discover}: ${title}`}
+                >
+                  <span>{content.discover}</span>
+                  <ArrowRight className="services-discover-arrow" size={17} aria-hidden="true" />
+                </Link>
+              </article>
             </Reveal>
           })}
         </div>}
